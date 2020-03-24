@@ -868,10 +868,10 @@ Great! Let's analyze the last instructions.
 00000001  53                push ebx
 ```
 - Moving top of the stack to the ECX registry, now stack looks like: 
-	- /bin/sh
-	- -c
-	- /bin/bash
-	- 0x00 (argv terminator)
+	- "/bin/sh"
+	- "-c"
+	- "/bin/bash"
+	- 0x00 -> argv terminator
 ```nasm
 00000002  89E1              mov ecx,esp
 ```
