@@ -1,6 +1,6 @@
 ### Shellcode No.1 - TCP Bind Shell ###
 
-At first, we will talk about linux/x86/shell_bind_tcp, which is very simmilar to the first assignment in SLAE Exam
+At first glance, we'll take payload linux/x86/shell_bind_tcp, very similar to the shellcode we wrote in the first SLAE exam task.
 
 ------------------------------------------------------------------------------------------------------------------------
 ```bash
