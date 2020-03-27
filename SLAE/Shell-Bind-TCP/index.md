@@ -337,7 +337,7 @@ sys_dup2:
 ```
 
 ### sys_execve() ###
-The last syscall we call will be sys_execve. In this case we see the placement of the string "/bin/sh" + string terminator \x00 in the EBX registry, using a stack.
+The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.
 
 After doing this, syscall establishes a listening port with an assigned shell when someone connects to it.
 
@@ -589,7 +589,7 @@ $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 
 A very nice improvement is to write a wrapper that will allow us to quickly change the port on which TCP Bind Shell should run.
 
-The port will always be a maximum of two bytes, regardless of whether it is port 1 (\ x01) or 65535 (\ xff \ xff). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (\ x11 \ x5c), with the port indicated as argument.
+The port will always be a maximum of two bytes, regardless of whether it is port 1 (`\x01`) or 65535 (`\xff\xff`). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (`\x11\x5c`), with the port indicated as argument.
 ```python
 #/usr/bin/python3
 import sys
