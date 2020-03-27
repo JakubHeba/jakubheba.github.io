@@ -3,6 +3,7 @@
 Today, we will deal with the process of creating Bind TCP Shell from scratch. As a rule, we distinguish between two types of shells that interest the pentester:
 - Bind TCP Shell
 - Reverse TCP Shell
+
 In the first case, it involves opening a listening port on the victim's system so that the attacker can remotely connect to his shell.
 
 First, we'll try to reproduce this behavior using a C program.
@@ -51,7 +52,7 @@ As we can see, in order to create a properly working program, it is necessary to
 - sys_listen()
 - sys_accept()
 - sys_dup2()
-- sys_ execve()
+- sys_execve()
 
 They are responsible for the whole process that the computer must perform to finally end with an open port waiting for connection.
 
@@ -118,6 +119,7 @@ We see, therefore, that this syscall accepts two arguments. The first is socket 
 The first function we call is sys_socket. Let's check its unique identifier.
 For "minor" syscalls called by socketcall(), their list is in the file:
 - /usr/include/linux/net.h
+
 ```sh
 $ cat /usr/include/linux/net.h | grep sys_socket
 #define SYS_SOCKET	1		/* sys_socket(2)		
@@ -129,6 +131,7 @@ int socket(int domain, int type, int protocol);
 ```
 In most cases, the man command accurately describes what each argument means and where we can find the values that describe it. If not, everything is in Google :)
 - AF_INET = 2 (PF_INET)
+
 ```sh
 $ vim /usr/include/i386-linux-gnu/bits/socket.h +122
 
@@ -139,12 +142,14 @@ $ vim /usr/include/i386-linux-gnu/bits/socket.h +78
 #define PF_INET         2       /* IP protocol family
 ```
 - SOCK_STREAM = 1
+
 ```sh
 $ vim /usr/include/i386-linux-gnu/bits/socket.h +42
 
 SOCK_STREAM = 1,              /* Sequenced, reliable, connection-based byte streams.  */
 ```
 - IPPROTO_IP = 0
+
 ```sh
 $ vim /usr/include/netinet/in.h + 34
 
@@ -369,10 +374,10 @@ global _start
 ; Header Files:
 ; -------------------------------------------------------------------------------------------------------
 ; |  Linux Syscall description file path: 		|  /usr/include/i386-linux-gnu/asm/unistd_32.h  |
-; |  Linux Socketcall numbers:				|  /usr/include/linux/net.h		|
-; |  Linux IP Protocols Declarations:			|  /usr/include/netinet/in.h		|
+; |  Linux Socketcall numbers:				|  /usr/include/linux/net.h			|
+; |  Linux IP Protocols Declarations:			|  /usr/include/netinet/in.h			|
 ; |  Linux System-specific socket constants and types:	|  /usr/include/i386-linux-gnu/bits/socket.h	|
-; |  Values for setsockopt():				|  /usr/include/asm-generic/socket.h	|
+; |  Values for setsockopt():				|  /usr/include/asm-generic/socket.h		|
 ; -------------------------------------------------------------------------------------------------------
 
 section .text
