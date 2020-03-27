@@ -537,7 +537,8 @@ sys_execve:
 
 Let's use scripts provided by Vivec in SLAE course materials.
 ```sh
-# cat ./compile.sh 
+$ cat ./compile.sh 
+
 #!/bin/bash
 echo '[+] Assembling with Nasm ... '
 nasm -f elf32 -o $1.o $1.nasm
