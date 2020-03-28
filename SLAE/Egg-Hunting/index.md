@@ -17,3 +17,9 @@ In this article, I will try to describe the process of creating three different 
 
 ### Access #1 ###
 
+The simplest idea of egg hunting can be understood on a practical example. We'll start with the first method described by Skape using access () system call. It is used to verify whether a given process has permissions in the system to access the file on the filesystem.
+As arguments, he takes only one value (the second in our case can be zero):
+```sh
+int (access const char * pathname, int mode);
+```
+It is also very important that the method does not perform any write operations, which could be very dangerous when searching the entire memory for the tag.
