@@ -1,6 +1,6 @@
 ### MSF Payloads Analysis ##
 
-I decided to divide the analysis into three parts due to the extensive descriptions and explanations.
+<p style="text-align: justify;">I decided to divide the analysis into three parts due to the extensive descriptions and explanations.</p>
 
 - [Linux/x86 TCP Bind Shell](Bind-Shell)
 ```sh
