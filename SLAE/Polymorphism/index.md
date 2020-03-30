@@ -7,9 +7,11 @@
 Analysis and use of polymorphism, part I:
 - [File Reader](File-Reader)
 <p style="text-align: justify;">Using JMP-CALL-POP technique, <i>sys_open, sys_read(), sys_write()</i> and <i>sys_exit()</i> system calls to read any file on the filesystem</p>
+
 Part II:
 - [Mkdir](Mkdir)
 <p style="text-align: justify;">Using JMP-CALL-POP technique, <i>sys_mkdir()</i> and <i>sys_exit()</i> system calls to create a folder on the filesystem</p>
+
 Part III:
 - [Modify Hosts File](Modify-Hosts) 
 <p style="text-align: justify;">Using JMP-CALL-POP technique, <i>sys_read(), sys_write()</i> and <i>sys_exit()</i> system calls to update the content of "/etc/hosts"</p>
