@@ -150,7 +150,7 @@ Code after changes:
 _write:
   pop ecx
   mov dl, len
-  int 0x80        ;syscall to write in the file
+  int 0x80       
 
 [..]
 
