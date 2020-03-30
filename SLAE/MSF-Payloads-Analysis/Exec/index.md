@@ -1,9 +1,10 @@
 # Shellcode No.3 - Exec Command
 
-At third glance, we'll take payload linux/x86/exec, for /bin/bash executing.
+<p style="text-align: justify;">At third glance, we'll take payload linux/x86/exec, for /bin/bash executing.</p>
 
 ------------------------------------------------------------------------------------------------------------------------
-Again, we'll use msfvenom for shellcode generation:
+<p style="text-align: justify;">Again, we'll use msfvenom for shellcode generation:</p>
+
 ```sh
 $ msfvenom -p linux/x86/exec CMD=/bin/bash -f c
 [-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload
@@ -45,7 +46,8 @@ Compiling:
 $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 ```
 ------------------------------------------------------------------------------------------------------------------------
-In the second terminal we can check the processes opened using `ps` command:
+<p style="text-align: justify;">In the second terminal we can check the processes opened using `ps` command:</p>
+
 ```sh
 $ ps
   PID TTY          TIME CMD
@@ -61,7 +63,7 @@ $ ps
 27058 pts/0    00:00:00 ps
 ```
 
-Fantastic, everything works fine. As we see, again there are some null bytes, which breaks our "Shellcode Length" counter.
+<p style="text-align: justify;">Fantastic, everything works fine. As we see, again there are some null bytes, which breaks our "Shellcode Length" counter.</p>
 
 ------------------------------------------------------------------------------------------------------------------------
 Let's use ndisasm again.
@@ -90,7 +92,7 @@ $ echo -ne "\x6a\x0b\x58\x99\x52\x66\x68\x2d\x63\x89\xe7\x68\x2f\x73\x68\x00\x68
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
-The analysis of this shellcode will not be divided into different parts. 
+<p style="text-align: justify;">The analysis of this shellcode will not be divided into different parts. </p>
 
 - Pushing value 11 on the stack (for execve())
 ```nasm
