@@ -11,7 +11,7 @@
 
 ### Part II: ###
 - [Mkdir](Mkdir)
-<p style="text-align: justify;">Using JMP-CALL-POP technique, <i>sys_mkdir()</i> and <i>sys_exit()</i> system calls to create a folder on the filesystem</p>
+<p style="text-align: justify;">Using <i>sys_mkdir()</i> and <i>sys_exit()</i> system calls to create a folder on the filesystem</p>
 
 ### Part III: ###
 - [Modify Hosts File](Modify-Hosts) 
