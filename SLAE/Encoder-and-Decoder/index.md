@@ -5,12 +5,12 @@
 
 ### Encoder ###
 
-Ours will be based in a way on some of them. It will be in order:
+<p style="text-align: justify;">Ours will be based in a way on some of them. It will be in order:</p>
 - XOR using ROT13
 - A pseudo-random number in the range 0-255, which the shellcode byte will be XORed, will be inserted "behind" it in the final, encoded shellcode (insertion).
 - 2 bit shifted to the right
 
-The decoder will rely on restoring the original "clean" shellcode, using operations completely opposite to those with which we encoded shellcode.
+<p style="text-align: justify;">The decoder will rely on restoring the original "clean" shellcode, using operations completely opposite to those with which we encoded shellcode.</p>
 
 Below is the full Encoders code.
 ```py
@@ -204,7 +204,8 @@ NASM version of encoded shellcode:
 ```
 ### Decoder ###
 
-Using the encoded shellcode generated, below is the Decoder code, written in NASM, along with explanatory comments on each line.
+<p style="text-align: justify;">Using the encoded shellcode generated, below is the Decoder code, written in NASM, along with explanatory comments on each line.</p>
+
 ```nasm
 ; Filename: 	decoder.nasm
 ; Author:  	Jakub Heba
@@ -258,7 +259,8 @@ $ objdump -d decoder -M intel
 80480bf:	81 90 ff 30 08 9d 95 	adc    DWORD PTR [eax-0x62f7cf01],0x8bd22595
 [..]
 ```
-We compile, link, and put the result of the objdump command in a wrapper written in C.
+<p style="text-align: justify;">We compile, link, and put the result of the objdump command in a wrapper written in C.</p>
+
 ```sh
 $ ./compile.sh decoder
 [+] Assembling with Nasm ... 
