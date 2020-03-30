@@ -283,9 +283,11 @@ lp:x:7:7:lp:/var/spool/lpd:/bin/sh
 Original shellcode length:
 
 - **65 bytes**
+
 Length of polymorphic shellcode:
 
 - **41 bytes**
+
 Difference in length:
 
 - **~37%**
