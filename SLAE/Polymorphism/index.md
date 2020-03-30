@@ -1,4 +1,4 @@
-# Polymorphism #
+# Polymorphism
 
 <p style="text-align: justify;">In this exercise, we will try to analyze and use polymorphism on three ready shellcodes hosted on shell-storm.com.</p>
 
