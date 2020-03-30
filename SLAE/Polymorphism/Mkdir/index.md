@@ -106,7 +106,7 @@ Code after changes:
 ```nasm
 ; Filename: 	mkdir.nasm
 ; Author:   	Jakub Heba
-; Purpose:	  SLAE Course & Exam
+; Purpose:	SLAE Course & Exam
 
 global _start			
 
@@ -118,7 +118,7 @@ _start:
 	push word 0x6465    ; 'ed' in reverse
 	push 0x6b636168     ; 'hack' in reverse
 	mov ebx, esp        ; The ECX register contains the address of the arguments on the stack
-	mov cx, 0x1ed	      ; file mode, hex(1ed) = dec(493) = oct(755)
+	mov cx, 0x1ed	    ; file mode, hex(1ed) = dec(493) = oct(755)
 	int 0x80            ; Execute system call
 	add al,0x1          ; EAX = 0, so let's make it 1
 	xor ebx, ebx        ; EBX should be 0
