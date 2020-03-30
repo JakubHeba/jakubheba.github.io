@@ -52,7 +52,7 @@ $ echo -ne "\xeb\x16\x5e\x31\xc0\x88\x46\x06\xb0\x27\x8d\x1e\x66\xb9\xed\x01\xcd
 ```
 <p style="text-align: justify;">I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.</p>
 
-### Mkdir 
+### sys_mkdir()
 
 Original code:
 ```nasm
