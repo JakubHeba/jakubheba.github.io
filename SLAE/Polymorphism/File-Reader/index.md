@@ -1,7 +1,7 @@
 # File Reader
 
 <p style="text-align: justify;">Address of the original shellcode:</p>
-- http://shell-storm.org/shellcode/files/shellcode-73.php
+- [http://shell-storm.org/shellcode/files/shellcode-73.php](http://shell-storm.org/shellcode/files/shellcode-73.php)
 
 Original source code:
 ```nasm
@@ -281,7 +281,7 @@ lp:x:7:7:lp:/var/spool/lpd:/bin/sh
 ### Summary
 
 Original shellcode length:
-- **65 bytes**
+- <b>65 bytes</b>
 Length of polymorphic shellcode:
 - **41 bytes**
 Difference in length:
