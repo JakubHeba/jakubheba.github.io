@@ -23,7 +23,8 @@ As arguments, he takes only one value (the second in our case can be zero):
 int (access const char * pathname, int mode);
 ```
 It is also very important that the method does not perform any write operations, which could be very dangerous when searching the entire memory for the tag.
-
+Test
+<script src="https://gist.github.com/JakubHeba/62bfcb9de490dd04585217acdd3928e4.js"></script>
 Here is the full Egg Hunter code, with explanatory comments.
 ```nasm
 ; Filename: 	egghunting.nasm
