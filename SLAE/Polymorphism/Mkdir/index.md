@@ -73,7 +73,7 @@ Original code:
 Code after changes:
 ```nasm
 	xor eax, eax        ; Clear the EAX register
-	add al, 0x27        ; EAX contains the mkdir () system call identifier
+	add al, 0x27        ; EAX contains the mkdir() system call identifier
 	push edi            ; string terminator
 	push word 0x6465    ; 'ed' in reverse
 	push 0x6b636168     ; 'hack' in reverse
@@ -113,7 +113,7 @@ global _start
 section .text
 _start:
 	xor eax, eax        ; Clear the EAX register
-	add al, 0x27        ; EAX contains the mkdir () system call identifier
+	add al, 0x27        ; EAX contains the mkdir() system call identifier
 	push edi            ; string terminator
 	push word 0x6465    ; 'ed' in reverse
 	push 0x6b636168     ; 'hack' in reverse
