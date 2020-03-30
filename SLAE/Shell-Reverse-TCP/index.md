@@ -86,7 +86,8 @@ $ cat /usr/include/i386-linux-gnu/asm/unistd_32.h | grep socketcall
 ```
 <p style="text-align: justify;">In addition, in order to call the system call, in most cases you will need to set the appropriate arguments (system calls should be treated as a function) in the correct registers and order.</p>
 
-Processor registers can be used as "containers" for arguments. In the case of system calls, it looks like this:
+<p style="text-align: justify;">Processor registers can be used as "containers" for arguments. In the case of system calls, it looks like this:</p>
+
 - EAX is responsible for the system call identifier
 - EBX holds the first argument
 - ECX holds the second argument
@@ -94,7 +95,7 @@ Processor registers can be used as "containers" for arguments. In the case of sy
 - ESI stores the fourth argument
 - EDI stores the fifth argument
 
-Situations where more than five arguments should be used fall outside the scope of this article.
+<p style="text-align: justify;">Situations where more than five arguments should be used fall outside the scope of this article.</p>
 
 <p style="text-align: justify;">In the case of socketcall() syscall, the situation looks slightly different. Due to the fact that other types of system calls will be called with it, the arguments describing these types must be placed in the reverse order (!) On the stack, and then the ECX register (second argument) must point to the top of the stack, in such way that the processor can easily get to the called syscall arguments.</p>
 
@@ -118,8 +119,8 @@ DESCRIPTION
 ```
 <p style="text-align: justify;">We see, therefore, that this syscall accepts two arguments. The first is socket function to invoke (for example, sys_socket()), the second indicates the arguments of this function (top of the stack in ECX).</p>
 
-The first function we call is sys_socket. Let's check its unique identifier.
-For "minor" syscalls called by socketcall(), their list is in the file:
+<p style="text-align: justify;">The first function we call is sys_socket. Let's check its unique identifier. For "minor" syscalls called by socketcall(), their list is in the file:</p>
+
 - /usr/include/linux/net.h
 
 ```sh
@@ -158,7 +159,7 @@ $ vim /usr/include/netinet/in.h + 34
 
 IPPROTO_IP = 0,        /* Dummy protocol for TCP.  */
 ```
-These arguments must be thrown in the reverse order due to the specifics of the stack.
+<p style="text-align: justify;">These arguments must be thrown in the reverse order due to the specifics of the stack.</p>
 
 Let's move to the NASM code:
 ```nasm
@@ -272,7 +273,7 @@ sys_dup2:
 ### sys_execve() ###
 <p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.</p>
 
-After doing this, syscall establishes a connection using configured address and port sending a `/bin/sh` shell.
+<p style="text-align: justify;">After doing this, syscall establishes a connection using configured address and port sending a `/bin/sh` shell.</p>
 
 We check the system call identifier:
 ```sh
@@ -310,7 +311,7 @@ sys_execve:
 ---------------------------------------------------------------------------
 
 ### reverse_shell.nasm ###
-That's all, below I present the entire code of the NASM file, which we will then put into the C language wrapper and try to execute.
+<p style="text-align: justify;">That's all, below I present the entire code of the NASM file, which we will then put into the C language wrapper and try to execute.</p>
 
 ```nasm
 ; Filename: reverse_shell.nasm
