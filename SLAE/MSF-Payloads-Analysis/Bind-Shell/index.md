@@ -1,4 +1,4 @@
-## Shellcode No.1 - TCP Bind Shell ##
+## Shellcode No.1 - TCP Bind Shell
 
 <p style="text-align: justify;">At first glance, we'll take payload linux/x86/shell_bind_tcp, very similar to the shellcode we wrote in the first SLAE exam task.</p>
 
