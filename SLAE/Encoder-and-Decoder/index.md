@@ -1,8 +1,6 @@
 # Shellcode Encoder & Decoder #
 
-Today we will deal with the process of creating an Encoder that will encode our "clean" shellcode with the help of Python, and then write Decoder using only NASM.
-
-Encoding is used to obfuscate the real purpose and function of shellcode so as to cheat security systems such as anti-virus programs running on heuristics.
+<p style="text-align: justify;>Today we will deal with the process of creating an Encoder that will encode our "clean" shellcode with the help of Python, and then write Decoder using only NASM.Encoding is used to obfuscate the real purpose and function of shellcode so as to cheat security systems such as anti-virus programs running on heuristics.</p>
 
 The main encoders used for the purpose are those based on XOR, NOR, substitution, insertion or other simple mathematical operations.
 
