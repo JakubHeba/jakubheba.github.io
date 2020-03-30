@@ -78,7 +78,7 @@ Code after changes:
 	push word 0x6465    ; 'ed' in reverse
 	push 0x6b636168     ; 'hack' in reverse
 	mov ebx, esp        ; The ECX register contains the address of the arguments on the stack
-	mov cx, 0x1ed	      ; file mode, hex(1ed) = dec(493) = oct(755)
+	mov cx, 0x1ed	    ; file mode, hex(1ed) = dec(493) = oct(755)
 	int 0x80            ; Execute system call
 ```
 <p style="text-align: justify;">As we can see, I gave up the JMP-CALL-POP technique in favor of placing a string with the name of the created folder on the stack with a null being a string terminator. This trick allowed to save up to 8 bytes!
