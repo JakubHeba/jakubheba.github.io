@@ -5,7 +5,7 @@
 - Bind TCP Shell
 - Reverse TCP Shell
 
-<p style="text-align: justify;">Reverse Shell consists of "sending" the shell, for example `/bin/sh` towards the listening attacker port. Unlike Bind Shell, we no longer need to bind on a port, listen on it and accept connections. All you need is a single sys_connect() syscall that does the same job connecting to, for example, listening netcat.</p>
+<p style="text-align: justify;">Reverse Shell consists of "sending" the shell, for example "/bin/sh" towards the listening attacker port. Unlike Bind Shell, we no longer need to bind on a port, listen on it and accept connections. All you need is a single sys_connect() syscall that does the same job connecting to, for example, listening netcat.</p>
 
 First, we'll try to reproduce this behavior using a C program.
 
@@ -271,9 +271,9 @@ sys_dup2:
 ```
 
 ### sys_execve() ###
-<p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.</p>
+<p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "/bin/sh" + string terminator "\x00" in the EBX registry, using a stack.</p>
 
-<p style="text-align: justify;">After doing this, syscall establishes a connection using configured address and port sending a `/bin/sh` shell.</p>
+<p style="text-align: justify;">After doing this, syscall establishes a connection using configured address and port sending a "/bin/sh" shell.</p>
 
 We check the system call identifier:
 ```sh
@@ -487,7 +487,7 @@ $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 
 ### Python port wrapper ###
 
-<p style="text-align: justify;">A very nice improvement is to write a wrapper that will allow us to quickly change the port, where TCP Reverse Shell should run. The port will always be a maximum of two bytes, regardless of whether it is port 1 (`\x01`) or 65535 (`\xff\xff`). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (`\x11\x5c`), with the port indicated as argument.</p>
+<p style="text-align: justify;">A very nice improvement is to write a wrapper that will allow us to quickly change the port, where TCP Reverse Shell should run. The port will always be a maximum of two bytes, regardless of whether it is port 1 ("\x01") or 65535 ("\xff\xff"). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM ("\x11\x5c"), with the port indicated as argument.</p>
 
 ```python
 #/usr/bin/python3
