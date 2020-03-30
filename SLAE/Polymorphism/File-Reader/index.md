@@ -97,9 +97,8 @@ _start:
 ```
 <p style="text-align: justify;">The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.</p>
 
- ### sys_open() 
+ ### sys_open() ###
  
- Note:
 <p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code.</p>
 
 ```nasm
