@@ -1,10 +1,11 @@
 # Bind TCP Shell
 
-Today, we will deal with the process of creating Bind TCP Shell from scratch. As a rule, we distinguish between two types of shells that interest the pentester:
+<p style="text-align: justify;">Today, we will deal with the process of creating Bind TCP Shell from scratch. As a rule, we distinguish between two types of shells that interest the pentester:</p>
+
 - Bind TCP Shell
 - Reverse TCP Shell
 
-In the first case, it involves opening a listening port on the victim's system so that the attacker can remotely connect to his shell.
+<p style="text-align: justify;">In the first case, it involves opening a listening port on the victim's system so that the attacker can remotely connect to his shell.</p>
 
 First, we'll try to reproduce this behavior using a C program.
 
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 }
 ```
 
-As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:
+<p style="text-align: justify;">As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
 
 - sys_socket()
 - sys_bind()
@@ -54,9 +55,9 @@ As we can see, in order to create a properly working program, it is necessary to
 - sys_dup2()
 - sys_execve()
 
-They are responsible for the whole process that the computer must perform to finally end with an open port waiting for connection.
+<p style="text-align: justify;">They are responsible for the whole process that the computer must perform to finally end with an open port waiting for connection.</p>
 
-So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.
+<p style="text-align: justify;">So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.</p>
 
 ### Clearing ###
 <p style="text-align: justify;">First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).</p>
@@ -80,12 +81,13 @@ cleaning:
 
 - /usr/include/i386-linux-gnu/asm/unistd_32.h
 
-Each call system has its own identifier, which if you want to call directly describes it. For example, socketcall () has the identifier 102, which can be easily checked by grepping its name.
+<p style="text-align: justify;">Each call system has its own identifier, which if you want to call directly describes it. For example, socketcall () has the identifier 102, which can be easily checked by grepping its name.</p>
+
 ```sh
 $ cat /usr/include/i386-linux-gnu/asm/unistd_32.h | grep socketcall
 #define __NR_socketcall 102
 ```
-In addition, in order to call the system call, in most cases you will need to set the appropriate arguments (system calls should be treated as a function) in the correct registers and order.
+<p style="text-align: justify;">In addition, in order to call the system call, in most cases you will need to set the appropriate arguments (system calls should be treated as a function) in the correct registers and order.</p>
 
 Processor registers can be used as "containers" for arguments. In the case of system calls, it looks like this:
 - EAX is responsible for the system call identifier
@@ -99,7 +101,8 @@ Situations where more than five arguments should be used fall outside the scope 
 
 <p style="text-align: justify;">In the case of socketcall() syscall, the situation looks slightly different. Due to the fact that other types of system calls will be called with it, the arguments describing these types must be placed in the reverse order (!) On the stack, and then the ECX register (second argument) must point to the top of the stack, in such way that the processor can easily get to the called syscall arguments.</p>
 
-So we know that there must be 102 in the EAX registry. How do you know what further arguments are required? In most cases, use the man command.
+<p style="text-align: justify;">So we know that there must be 102 in the EAX registry. How do you know what further arguments are required? In most cases, use the man command.</p>
+
 ```sh
 $ man 2 socketcall
 SOCKETCALL(2)              Linux Programmer's Manual             SOCKETCALL(2)
@@ -116,7 +119,7 @@ DESCRIPTION
        to a block containing the actual arguments, which are passed through to
        the appropriate call.
 ```
-We see, therefore, that this syscall accepts two arguments. The first is socket function to invoke (for example, sys_socket()), the second indicates the arguments of this function (top of the stack in ECX).
+<p style="text-align: justify;">We see, therefore, that this syscall accepts two arguments. The first is socket function to invoke (for example, sys_socket()), the second indicates the arguments of this function (top of the stack in ECX).</p>
 
 The first function we call is sys_socket. Let's check its unique identifier.
 For "minor" syscalls called by socketcall(), their list is in the file:
@@ -131,7 +134,7 @@ Identifier is 1, let's check what arguments are expected.
 $ man 2 socket | grep "int socket"
 int socket(int domain, int type, int protocol);
 ```
-In most cases, the man command accurately describes what each argument means and where we can find the values that describe it. If not, everything is in Google :)
+<p style="text-align: justify;">In most cases, the man command accurately describes what each argument means and where we can find the values that describe it. If not, everything is in Google :)</p>
 - AF_INET = 2 (PF_INET)
 
 ```sh
@@ -182,7 +185,7 @@ sys_socket:
 ```
 
 ### sys_bind() ###
-The next call system will be sys_bind. The whole process looks very similar, except that we have here "throwing" arguments to the stack and indicating their top to the ECX register twice.
+<p style="text-align: justify;">The next call system will be sys_bind. The whole process looks very similar, except that we have here "throwing" arguments to the stack and indicating their top to the ECX register twice.</p>
 
 We check the system call identifier:
 ```sh
@@ -335,7 +338,7 @@ sys_dup2:
 ```
 
 ### sys_execve() ###
-The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.
+<p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.</p>
 
 After doing this, syscall establishes a listening port with an assigned shell when someone connects to it.
 
@@ -375,7 +378,7 @@ sys_execve:
 ---------------------------------------------------------------------------
 
 ### bind_shell.nasm ###
-That's all, below I present the entire code of the NASM file, which we will then put into the C language wrapper and try to execute.
+<p style="text-align: justify;">That's all, below I present the entire code of the NASM file, which we will then put into the C language wrapper and try to execute.</p>
 
 ```nasm
 ; Filename: bind_shell.nasm
@@ -552,7 +555,8 @@ $ ./compile.sh bind_shell
 
 ### Preparing C Wrapper ###
 
-Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.
+<p style="text-align: justify;">Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.</p>
+
 ```sh
 $ objdump -d ./bind_shell|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
 
@@ -585,7 +589,7 @@ $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 
 ### Python port wrapper ###
 
-A very nice improvement is to write a wrapper that will allow us to quickly change the port on which TCP Bind Shell should run.
+<p style="text-align: justify;">A very nice improvement is to write a wrapper that will allow us to quickly change the port on which TCP Bind Shell should run.</p>
 
 <p style="text-align: justify;">The port will always be a maximum of two bytes, regardless of whether it is port 1 (`\x01`) or 65535 (`\xff\xff`). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (`\x11\x5c`), with the port indicated as argument.</p>
 
