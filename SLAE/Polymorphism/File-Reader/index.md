@@ -99,7 +99,8 @@ _start:
 
  ### sys_open() 
  
-<p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code</p>
+ Note:
+<p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code.</p>
 
 ```nasm
  two:
