@@ -290,4 +290,6 @@ Length of polymorphic shellcode:
 
 Difference in length:
 
-- **~37%**
+- **~37% shorter!**
+
+### Pwned.
