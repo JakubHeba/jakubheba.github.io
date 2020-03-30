@@ -246,7 +246,7 @@ uid=0(root) gid=0(root) groups=0(root)
 Following the [Skape document](http://www.hick.org/code/skape/papers/egghunt-shellcode.pdf):
 
 <p style="text-align: justify; background-color: #333333;"><i>The sigaction approach allows multiple addresses tobe validated at a single time by taking advantage of the kernel’s verify area routine which is used, for instance, on structures that have been passed in from user-mode to a system call.
-[..]
+<br>[..]<br>
 The goal here will be to use the act structure as the pointer for validating alarger region of memory than a single byte (as was the case with the access system call)</i></p>
 
 Finding the system call identifier:
