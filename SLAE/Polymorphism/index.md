@@ -2,7 +2,7 @@
 
 <p style="text-align: justify;">In this exercise, we will try to analyze and use polymorphism on three ready shellcodes hosted on shell-storm.com.</p>
 
-<p style="text-align: justify;">Polymorphism consists in optimizing or changing the program code while keeping all its functionalities. This technique is very often used to deceive and bypass security systems such as antivirus programs.<p>
+<p style="text-align: justify;">Polymorphism consists in optimizing or changing the program code while keeping all its functionalities. This technique is very often used to deceive and bypass security systems such as antivirus programs.</p>
 
 ### Analysis and use of polymorphism, part I: ###
 
