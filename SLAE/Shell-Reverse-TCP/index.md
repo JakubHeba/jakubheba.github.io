@@ -1,6 +1,7 @@
 # Reverse TCP Shell
 
-Today, we will deal with the process of creating Reverse TCP Shell from scratch. As a rule, we distinguish between two types of shells that interest the pentester:
+<p style="text-align: justify;">Today, we will deal with the process of creating Reverse TCP Shell from scratch. As a rule, we distinguish between two types of shells that interest the pentester:</p>
+
 - Bind TCP Shell
 - Reverse TCP Shell
 
@@ -44,16 +45,16 @@ int main(int argc, char **argv)
 }
 ```
 
-As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:
+<p style="text-align: justify;">As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
 
 - sys_socket()
 - sys_connect()
 - sys_dup2()
 - sys_execve()
 
-They are responsible for the whole process that the computer must perform to finally end with the shell sent to the address and port of the listening attacker.
+<p style="text-align: justify;">They are responsible for the whole process that the computer must perform to finally end with the shell sent to the address and port of the listening attacker.</p>
 
-So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.
+<p style="text-align: justify;">So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.</p>
 
 ### Clearing ###
 <p style="text-align: justify;">First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).</p>
@@ -77,12 +78,13 @@ cleaning:
 
 - /usr/include/i386-linux-gnu/asm/unistd_32.h
 
-Each call system has its own identifier, which if you want to call directly describes it. For example, socketcall () has the identifier 102, which can be easily checked by grepping its name.
+<p style="text-align: justify;">Each call system has its own identifier, which if you want to call directly describes it. For example, socketcall () has the identifier 102, which can be easily checked by grepping its name.</p>
+
 ```sh
 $ cat /usr/include/i386-linux-gnu/asm/unistd_32.h | grep socketcall
 #define __NR_socketcall 102
 ```
-In addition, in order to call the system call, in most cases you will need to set the appropriate arguments (system calls should be treated as a function) in the correct registers and order.
+<p style="text-align: justify;">In addition, in order to call the system call, in most cases you will need to set the appropriate arguments (system calls should be treated as a function) in the correct registers and order.</p>
 
 Processor registers can be used as "containers" for arguments. In the case of system calls, it looks like this:
 - EAX is responsible for the system call identifier
@@ -96,7 +98,8 @@ Situations where more than five arguments should be used fall outside the scope 
 
 <p style="text-align: justify;">In the case of socketcall() syscall, the situation looks slightly different. Due to the fact that other types of system calls will be called with it, the arguments describing these types must be placed in the reverse order (!) On the stack, and then the ECX register (second argument) must point to the top of the stack, in such way that the processor can easily get to the called syscall arguments.</p>
 
-So we know that there must be 102 in the EAX registry. How do you know what further arguments are required? In most cases, use the man command.
+<p style="text-align: justify;">So we know that there must be 102 in the EAX registry. How do you know what further arguments are required? In most cases, use the man command.</p>
+
 ```sh
 $ man 2 socketcall
 SOCKETCALL(2)              Linux Programmer's Manual             SOCKETCALL(2)
@@ -128,7 +131,8 @@ Identifier is 1, let's check what arguments are expected.
 $ man 2 socket | grep "int socket"
 int socket(int domain, int type, int protocol);
 ```
-In most cases, the man command accurately describes what each argument means and where we can find the values that describe it. If not, everything is in Google :)
+<p style="text-align: justify;">In most cases, the man command accurately describes what each argument means and where we can find the values that describe it. If not, everything is in Google :)</p>
+
 - AF_INET = 2 (PF_INET)
 
 ```sh
@@ -266,7 +270,7 @@ sys_dup2:
 ```
 
 ### sys_execve() ###
-The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.
+<p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "`/bin/sh`" + string terminator `\x00` in the EBX registry, using a stack.</p>
 
 After doing this, syscall establishes a connection using configured address and port sending a `/bin/sh` shell.
 
@@ -448,7 +452,8 @@ $ ./compile.sh reverse_shell
 
 ### Preparing C Wrapper ###
 
-Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.
+<p style="text-align: justify;">Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.</p>
+
 ```sh
 $ objdump -d ./reverse_shell|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
 
