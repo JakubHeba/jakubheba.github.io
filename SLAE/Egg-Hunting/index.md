@@ -243,9 +243,9 @@ uid=0(root) gid=0(root) groups=0(root)
 
 <p style="text-align: justify;">It gains a clear acceleration by being able to process more than one address at a time (which was a restriction for the first two methods).</p>
 
-Following the Skape document:
+Following the [Skape document](http://www.hick.org/code/skape/papers/egghunt-shellcode.pdf):
 
-<p style="text-align: justify;"><i>The sigaction approach allows multiple addresses tobe validated at a single time by taking advantage of the kernel’s verify area routine which is used, for instance, on structures that have been passed in from user-mode to a system call.
+<p style="text-align: justify; background-color: #333333;"><i>The sigaction approach allows multiple addresses tobe validated at a single time by taking advantage of the kernel’s verify area routine which is used, for instance, on structures that have been passed in from user-mode to a system call.
 [..]
 The goal here will be to use the act structure as the pointer for validating alarger region of memory than a single byte (as was the case with the access system call)</i></p>
 
