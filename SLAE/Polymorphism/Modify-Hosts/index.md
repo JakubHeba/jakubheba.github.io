@@ -159,7 +159,7 @@ _load_data:
   google db "127.1.1.1 google.com"
   len equ $-google
 ```
-<p style="text-align: justify;">At the beginning, I changed a very optimal solution using the XCHG instruction to a simpler MOV. Then, the JMP-CALL-POP technique is called. As you probably remember, I used it once in this code, so the second use should be impossible. At the time of the CALL statement, the value you want to add to the file is thrown onto the stack, as well as the next lines of code, i.e. previously used string "/etc/hosts". However, the argument that we put in the EDX register comes in handy, which is the length of the string we want to put in the write () function. With its help, we can "cut" the long string only to the amount that interests us. To this end, I used the nasm language function - length (), assigning it to the variable "len".
+<p style="text-align: justify;">At the beginning, I changed a very optimal solution using the XCHG instruction to a simpler MOV. Then, the JMP-CALL-POP technique is called. As you probably remember, I used it once in this code, so the second use should be impossible. At the time of the CALL statement, the value you want to add to the file is thrown onto the stack, as well as the next lines of code, i.e. previously used string "/etc/hosts". However, the argument that we put in the EDX register comes in handy, which is the length of the string we want to put in the write() function. With its help, we can "cut" the long string only to the amount that interests us. To this end, I used the nasm language function - length(), assigning it to the variable "len".
 </p>
 
 ### sys_close()
