@@ -1,4 +1,4 @@
-# Egg Hunting #
+# Egg Hunting
 
 <p style="text-align: justify;">Definition. Following the <a href="http://www.hick.org/code/skape/papers/egghunt-shellcode.pdf">fantastic document</a> created by Skape:</p>
 
