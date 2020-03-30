@@ -197,6 +197,10 @@ exit:
 ### Full code after changes
 
 ```nasm
+; Filename: 	file-reader.nasm
+; Author:  	Jakub Heba
+; Purpose:	SLAE Course & Exam
+
 global _start			
 
 section .text
