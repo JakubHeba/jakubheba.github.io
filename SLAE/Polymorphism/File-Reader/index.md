@@ -95,9 +95,10 @@ _start:
 	xor eax, eax
 	jmp two
 ```
-<p style="text-align: justify;">The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.</p>
+<p style="text-align: justify;">The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.
+</p>
 
- ### sys_open() ###
+### sys_open()
  
 <p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code.</p>
 
@@ -105,7 +106,7 @@ _start:
  two:
   call one
 ```
- Original code:
+Original code:
 ```nasm
  one:
 	pop ebx
@@ -115,7 +116,7 @@ _start:
 	mov esi, eax
 	jmp read
 ```
- Code after changes:
+Code after changes:
 ```nasm
  one:
 	pop ebx
@@ -123,11 +124,12 @@ _start:
 	int 0x80
 	mov esi, eax
 ```
-<p style="text-align: justify;">When this part of the code is called, the ECX index is empty, so there is no need to clean it again. Due to the change in the order of the sections in the code - I moved the "exit" section directly after the "read" section - the "jmp read" instruction is no longer needed, as the "read" section code lines immediately follow the "one" section.</p>
+<p style="text-align: justify;">When this part of the code is called, the ECX index is empty, so there is no need to clean it again. Due to the change in the order of the sections in the code - I moved the "exit" section directly after the "read" section - the "jmp read" instruction is no longer needed, as the "read" section code lines immediately follow the "one" section.
+</p>
  
- ### sys_read()
+### sys_read()
  
- Original code:
+Original code:
 ```nasm
  read:
 	mov ebx, esi
@@ -137,7 +139,7 @@ _start:
 	mov dl, 1
 	int 0x80
 ```
- Code after changes:
+Code after changes:
 ```nasm
  read:
 	mov ebx, esi
@@ -146,7 +148,8 @@ _start:
 	mov dl, 1
 	int 0x80
 ```
-<p style="text-align: justify;">I replaced two instructions - changing the ESP value, i.e. top of the stack (sub esp, 1) and pointing his pointer to ECX index (lea ecx, [esp]), to one instruction placing the top of the stack directly in the ECX register (mov ecx, esp ).</p>
+<p style="text-align: justify;">I replaced two instructions - changing the ESP value, i.e. top of the stack (sub esp, 1) and pointing his pointer to ECX index (lea ecx, [esp]), to one instruction placing the top of the stack directly in the ECX register (mov ecx, esp ).
+</p>
 
 ### sys_write()
 
