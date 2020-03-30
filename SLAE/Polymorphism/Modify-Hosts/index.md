@@ -87,7 +87,8 @@ Code after changes:
 </p>
 
 ### sys_open()
- 
+
+Original code:
 ```nasm
   mov al, 0x5     
   push ecx
