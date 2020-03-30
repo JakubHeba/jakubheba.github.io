@@ -59,7 +59,8 @@ They are responsible for the whole process that the computer must perform to fin
 So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.
 
 ### Clearing ###
-First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).
+<p style="text-align: justify;">First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).</p>
+
 ```nasm
 global _start
 
@@ -75,9 +76,8 @@ cleaning:
 ```
 
 ### sys_socket() ###
-Then, we proceed to create the socket. For this purpose, we will use socketcall() syscall, which will allow us to easily call subsequent types of system calls (socket, bind, listen ....).
+<p style="text-align: justify;">Then, we proceed to create the socket. For this purpose, we will use socketcall() syscall, which will allow us to easily call subsequent types of system calls (socket, bind, listen ....). At this point I would like to explain the principle of system calls. Their list, in the case of systems based on intel x86 processors, can be found in the file:</p>
 
-At this point I would like to explain the principle of system calls. Their list, in the case of systems based on intel x86 processors, can be found in the file:
 - /usr/include/i386-linux-gnu/asm/unistd_32.h
 
 Each call system has its own identifier, which if you want to call directly describes it. For example, socketcall () has the identifier 102, which can be easily checked by grepping its name.
@@ -97,8 +97,7 @@ Processor registers can be used as "containers" for arguments. In the case of sy
 
 Situations where more than five arguments should be used fall outside the scope of this article.
 
-In the case of socketcall() syscall, the situation looks slightly different. 
-Due to the fact that other types of system calls will be called with it, the arguments describing these types must be placed in the reverse order (!) On the stack, and then the ECX register (second argument) must point to the top of the stack, in such way that the processor can easily get to the called syscall arguments.
+<p style="text-align: justify;">In the case of socketcall() syscall, the situation looks slightly different. Due to the fact that other types of system calls will be called with it, the arguments describing these types must be placed in the reverse order (!) On the stack, and then the ECX register (second argument) must point to the top of the stack, in such way that the processor can easily get to the called syscall arguments.</p>
 
 So we know that there must be 102 in the EAX registry. How do you know what further arguments are required? In most cases, use the man command.
 ```sh
@@ -295,8 +294,7 @@ sys_accept:
 ```
 
 ### sys_dup2() ###
-Another syscall, sys_dup2() can be implemented in many ways, for example by using loops. I decided to do it step by step in order to better illustrate the arguments raised.
-It is worth noting that it is not called from socketcall(), but directly as system syscall.
+<p style="text-align: justify;">Another syscall, sys_dup2() can be implemented in many ways, for example by using loops. I decided to do it step by step in order to better illustrate the arguments raised. It is worth noting that it is not called from socketcall(), but directly as system syscall.</p>
 
 We check the system call identifier:
 ```sh
@@ -589,7 +587,8 @@ $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 
 A very nice improvement is to write a wrapper that will allow us to quickly change the port on which TCP Bind Shell should run.
 
-The port will always be a maximum of two bytes, regardless of whether it is port 1 (`\x01`) or 65535 (`\xff\xff`). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (`\x11\x5c`), with the port indicated as argument.
+<p style="text-align: justify;">The port will always be a maximum of two bytes, regardless of whether it is port 1 (`\x01`) or 65535 (`\xff\xff`). Therefore, we can use a simple trick to replace port 4444, indicated by us in NASM (`\x11\x5c`), with the port indicated as argument.</p>
+
 ```python
 #/usr/bin/python3
 import sys
