@@ -46,7 +46,7 @@ Compiling:
 $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 ```
 ------------------------------------------------------------------------------------------------------------------------
-<p style="text-align: justify;">In the second terminal we can check the processes opened using `ps` command:</p>
+<p style="text-align: justify;">In the second terminal we can check the processes opened using "ps" command:</p>
 
 ```sh
 $ ps
