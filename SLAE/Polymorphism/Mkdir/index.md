@@ -56,7 +56,6 @@ $ echo -ne "\xeb\x16\x5e\x31\xc0\x88\x46\x06\xb0\x27\x8d\x1e\x66\xb9\xed\x01\xcd
 
 Original code:
 ```nasm
-
 00000000  EB16              jmp short 0x18
 00000002  5E                pop esi
 00000003  31C0              xor eax,eax
@@ -73,7 +72,7 @@ Original code:
 ```
 Code after changes:
 ```nasm
-  xor eax, eax        ; Clear the EAX register
+	xor eax, eax        ; Clear the EAX register
 	add al, 0x27        ; EAX contains the mkdir () system call identifier
 	push edi            ; string terminator
 	push word 0x6465    ; 'ed' in reverse
@@ -95,7 +94,7 @@ Original code:
 ```
 Code after changes:
 ```nasm
-  add al,0x1          ; EAX = 0, so let's make it 1
+  	add al,0x1          ; EAX = 0, so let's make it 1
 	xor ebx, ebx        ; EBX should be 0
 	int 0x80            ; Execute exit() syscall
 ```
