@@ -348,5 +348,12 @@ Linux kali 5.4.0-kali4-amd64 #1 SMP Debian 5.4.19-1kali1 (2020-02-17) x86_64 GNU
 
 ### Pwned.
 
-<p style="text-align: justify;">This blog post has been created for completing the requirements of the SecurityTube Linux Assembly Expert certification: <a href="https://www.pentesteracademy.com/course?id=3">https://www.pentesteracademy.com/course?id=3</a></p>
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+<p style="text-align: justify;">This blog post has been created for completing the requirements of the SecurityTube Linux Assembly Expert certification: https://www.pentesteracademy.com/course?id=3</p>
+
 Student ID: SLAE-1524
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
