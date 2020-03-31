@@ -16,7 +16,7 @@
 - sigaction
 
 <p style="text-align: justify;">In every example, as shellcode we will use a reverse shell written in Assignment number 2, based on the execve-stack technique.</p>
-
+------------------------------------------------------------------------------------------------
 ### Access #1 ###
 
 <p style="text-align: justify;">The simplest idea of egg hunting can be understood on a practical example. We'll start with the first method described by Skape using access() system call. It is used to verify whether a given process has permissions in the system to access the file on the filesystem.</p>
@@ -134,6 +134,7 @@ root
 
 **Pwned.**
 
+------------------------------------------------------------------------------------------------
 ### Access #2 ###
 
 <p style="text-align: justify;">Another example is also based on access() system call, but its implementation is slightly more optimal, which means we are able to save 4 bytes in length.</p>
@@ -239,6 +240,7 @@ uid=0(root) gid=0(root) groups=0(root)
 
 **Pwned.**
 
+------------------------------------------------------------------------------------------------
 ### Sigaction ###
 
 <p style="text-align: justify;">The last technique will be to use sigaction() call system. This method is the most optimal (about 3 times faster) and 5 bytes shorter (30 bytes in length).</p>
