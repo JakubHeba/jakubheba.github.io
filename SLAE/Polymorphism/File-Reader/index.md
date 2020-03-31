@@ -72,6 +72,7 @@ char main[]=
 ```
 <p style="text-align: justify;">I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.</p>
 
+------------------------------------------------------------------------------------------------
 ### Clearing 
 
 Original code:
@@ -97,7 +98,7 @@ _start:
 ```
 <p style="text-align: justify;">The EBX, ECX and EDX registers are empty when you enter the _start() function, so there is no need to clean them.
 </p>
-
+------------------------------------------------------------------------------------------------
 ### sys_open()
  
 <p style="text-align: justify;">The "two" section remains unchanged and remains at the end of our code.</p>
@@ -126,7 +127,7 @@ Code after changes:
 ```
 <p style="text-align: justify;">When this part of the code is called, the ECX index is empty, so there is no need to clean it again. Due to the change in the order of the sections in the code - I moved the "exit" section directly after the "read" section - the "jmp read" instruction is no longer needed, as the "read" section code lines immediately follow the "one" section.
 </p>
- 
+------------------------------------------------------------------------------------------------
 ### sys_read()
  
 Original code:
@@ -150,7 +151,7 @@ Code after changes:
 ```
 <p style="text-align: justify;">I replaced two instructions - changing the ESP value, i.e. top of the stack (sub esp, 1) and pointing his pointer to ECX index (lea ecx, [esp]), to one instruction placing the top of the stack directly in the ECX register (mov ecx, esp ).
 </p>
-
+------------------------------------------------------------------------------------------------
 ### sys_write()
 
 Original code:
@@ -175,7 +176,7 @@ Code after changes:
 	jmp read
 ```
 <p style="text-align: justify;">This section has been completely rebuilt. At the beginning, instead of resetting the EBX register and then comparing it to EAX, and if the values are the same (both registers are zero), execute JMP to the "exit" section, EAX using the logical operator OR is compared to zero and if ZF flag is set, JMP to the "exit" section is executed. Then, due to the fact that the EDX register is already 1, instead of two separate instructions, one "mov ebx, edx" is enough to get the same effect. Finally, since we did not use the "sub esp, 1" statement in the sys_read() section, the "add esp, 1" statement is also unnecessary.</p>
-
+------------------------------------------------------------------------------------------------
 ### sys_exit()
 
 Original code:
@@ -193,7 +194,7 @@ exit:
 	int 0x80
 ```
 <p style="text-align: justify;">After the sys_write () system call, the EAX register contains zero, the MOV instruction is replaced by a simple "inc eax". In addition, cleaning the EBX registry is also unnecessary.</p>
-
+------------------------------------------------------------------------------------------------
 ### Full code after changes
 
 ```nasm
@@ -235,7 +236,7 @@ exit:
 two:
 	call one
 ```
-
+------------------------------------------------------------------------------------------------
 ### Compiling and Execution
 
 ```sh
@@ -281,7 +282,7 @@ man:x:6:12:man:/var/cache/man:/bin/sh
 lp:x:7:7:lp:/var/spool/lpd:/bin/sh
 [..]
 ```
-
+------------------------------------------------------------------------------------------------
 ### Summary
 
 Original shellcode length:
