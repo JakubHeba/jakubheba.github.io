@@ -38,3 +38,14 @@
 <p style="text-align: justify;"><i>Implementation of AES 128 bit encryption with HMAC using SHA256 to make detection more difficult for anti-virus systems, using Python and shellcod running a reverse shell.</i></p>
 
 ---------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
