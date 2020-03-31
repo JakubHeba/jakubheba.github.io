@@ -412,7 +412,6 @@ global _start
 ; |  Linux Socketcall numbers:				|  /usr/include/linux/net.h			|
 ; |  Linux IP Protocols Declarations:			|  /usr/include/netinet/in.h			|
 ; |  Linux System-specific socket constants and types:	|  /usr/include/i386-linux-gnu/bits/socket.h	|
-; |  Values for setsockopt():				|  /usr/include/asm-generic/socket.h		|
 ; -------------------------------------------------------------------------------------------------------
 
 section .text
