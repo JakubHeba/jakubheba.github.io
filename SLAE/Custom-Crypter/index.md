@@ -7,6 +7,7 @@
 - HMAC using SHA256 for authentication.
 - Initialization vectors are generated using os.urandom().
 - The password will be static, but in every non-test consideration it should never be placed inside the file, but received from the user
+
 ------------------------------------------------------------------------------------------------
 ### Shellcode
 
