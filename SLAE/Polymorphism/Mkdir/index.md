@@ -51,7 +51,7 @@ $ echo -ne "\xeb\x16\x5e\x31\xc0\x88\x46\x06\xb0\x27\x8d\x1e\x66\xb9\xed\x01\xcd
 00000023  23                db 0x23
 ```
 <p style="text-align: justify;">I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.</p>
-
+------------------------------------------------------------------------------------------------
 ### sys_mkdir()
 
 Original code:
@@ -83,7 +83,7 @@ Code after changes:
 ```
 <p style="text-align: justify;">As we can see, I gave up the JMP-CALL-POP technique in favor of placing a string with the name of the created folder on the stack with a null being a string terminator. This trick allowed to save up to 8 bytes!
 </p>
-
+------------------------------------------------------------------------------------------------
 ### sys_exit()
 
 Original code:
@@ -100,7 +100,7 @@ Code after changes:
 ```
 <p style="text-align: justify;">Only one line has been changed - the ADD instruction was used instead of the MOV instruction.
 </p>
-
+------------------------------------------------------------------------------------------------
 ### Full code after changes
 
 ```nasm
@@ -124,7 +124,7 @@ _start:
 	xor ebx, ebx        ; EBX should be 0
 	int 0x80            ; Execute exit() syscall
 ```
-
+------------------------------------------------------------------------------------------------
 ### Compiling and Execution
 
 ```sh
@@ -175,7 +175,7 @@ drwxr-xr-x 2 root root 4096 Mar 30 12:45 hacked           <------
 -rw-rw-r-- 1 slae slae  232 Mar 25 16:05 template.nasm
 -rw-rw-r-- 1 slae slae  448 Mar 30 12:43 template.o
 ```
-
+------------------------------------------------------------------------------------------------
 ### Summary
 
 Original shellcode length:
