@@ -293,3 +293,13 @@ man:x:6:12:man:/var/cache/man:/bin/sh
 [..]
 ```
 ### Pwned. ###
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+<p style="text-align: justify;">This blog post has been created for completing the requirements of the SecurityTube Linux Assembly Expert certification: https://www.pentesteracademy.com/course?id=3</p>
+
+Student ID: SLAE-1524
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
