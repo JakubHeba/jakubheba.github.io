@@ -10,7 +10,7 @@
 
 ### Shellcode
 
-<p style="text-align: justify;">We'll use Crypter against shellcode from Assignment No. 2, which means reverse shell. These operations are carried out in order to deceive or bypass anti-virus software or other security systems.</p>
+<p style="text-align: justify;">We'll use Crypter against shellcode from Assignment No. 2, which means reverse shell written using execve-stack technique. These operations are carried out in order to deceive or bypass anti-virus software or other security systems.</p>
 
 To start with, here is our shellcode in NASM:
 ```nasm
