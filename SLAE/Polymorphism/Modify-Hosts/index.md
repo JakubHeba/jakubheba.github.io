@@ -70,7 +70,7 @@ main()
 }
 ```
 <p style="text-align: justify;">I will try to present my polymorphic shellcode in parts (and finally the whole) in order to explain in detail the changes and improvements I have made.</p>
-
+------------------------------------------------------------------------------------------------
 ### Clearing 
 
 Original code:
@@ -118,7 +118,7 @@ _second:
 ```
 <p style="text-align: justify;">The opening of the file has been thoroughly rebuilt. As you can see, I used the JMP-CALL-POP technique to load the "/ etc / hosts" value on top of the stack and then put it in EBX with the "pop ebx" instruction. The method of placing the value 5 in EAX has also been changed (from MOV to ADD).
 </p>
- 
+------------------------------------------------------------------------------------------------
 ### sys_write()
  
 Original code:
@@ -161,7 +161,7 @@ _load_data:
 ```
 <p style="text-align: justify;">At the beginning, I changed a very optimal solution using the XCHG instruction to a simpler MOV. Then, the JMP-CALL-POP technique is called. As you probably remember, I used it once in this code, so the second use should be impossible. At the time of the CALL statement, the value you want to add to the file is thrown onto the stack, as well as the next lines of code, i.e. previously used string "/etc/hosts". However, the argument that we put in the EDX register comes in handy, which is the length of the string we want to put in the write() function. With its help, we can "cut" the long string only to the amount that interests us. To this end, I used the nasm language function - length(), assigning it to the variable "len".
 </p>
-
+------------------------------------------------------------------------------------------------
 ### sys_close()
 
 Original code:
@@ -173,11 +173,11 @@ Original code:
 
 <p style="text-align: justify;">After analysis and tests, despite the fact that this is not very elegant behavior, you can completely skip sys_close() system call, because the file is already overwritten (goal achieved). It remains therefore only to close the program - sys_exit().
 </p>
-
+------------------------------------------------------------------------------------------------
 ### sys_exit()
 
 <p style="text-align: justify;">These lines of code remained unchanged.</p>
-
+------------------------------------------------------------------------------------------------
 ### Full code after changes
 
 ```nasm
@@ -220,7 +220,7 @@ _second:
   call _hosts             ; JMP to _hosts section
   host db "/etc/hosts"
 ```
-
+------------------------------------------------------------------------------------------------
 ### Compiling and Execution
 
 ```sh
@@ -277,7 +277,7 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 127.1.1.1 google.com            <---------
 ```
-
+------------------------------------------------------------------------------------------------
 ### Summary
 
 Original shellcode length:
