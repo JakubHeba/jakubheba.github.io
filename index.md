@@ -29,9 +29,12 @@
 
 ---------------------------------------------------------------------------------------------------------
 - **6.** [Polymorphism](/SLAE/Polymorphism)
+
 *The use of polymorphism, i.e. optimization and change of programming techniques when writing code, while maintaining the function and operation of the program in relation to three ready shellcodes from shell-storm.org.*
 
 ---------------------------------------------------------------------------------------------------------
 - **7.** [Custom Crypter](/SLAE/Custom-Crypter)
+
 *Implementation of AES 128 bit encryption with HMAC using SHA256 to make detection more difficult for anti-virus systems, using Python and shellcod running a reverse shell.*
+
 ---------------------------------------------------------------------------------------------------------
