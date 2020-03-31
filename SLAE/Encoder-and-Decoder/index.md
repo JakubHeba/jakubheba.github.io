@@ -12,7 +12,8 @@
 
 <p style="text-align: justify;">The decoder will rely on restoring the original "clean" shellcode, using operations completely opposite to those with which we encoded shellcode.</p>
 
-Below is the full Encoders code.
+<p style="text-align: justify;">Below is the full Encoders code. As shellcode we will use a reverse shell written in Assignment number 2, based on the execve-stack technique.</p>
+
 ```py
 import random
 
