@@ -335,8 +335,8 @@ global _start
 ; Header Files:
 ; -------------------------------------------------------------------------------------------------------
 ; |  Linux Syscall description file path: 		|  /usr/include/i386-linux-gnu/asm/unistd_32.h  |
-; |  Linux Socketcall numbers:				|  /usr/include/linux/net.h		|
-; |  Linux IP Protocols Declarations:			|  /usr/include/netinet/in.h		|
+; |  Linux Socketcall numbers:				|  /usr/include/linux/net.h			|
+; |  Linux IP Protocols Declarations:			|  /usr/include/netinet/in.h			|
 ; |  Linux System-specific socket constants and types:	|  /usr/include/i386-linux-gnu/bits/socket.h	|
 ; -------------------------------------------------------------------------------------------------------
 
