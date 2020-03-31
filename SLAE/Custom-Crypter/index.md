@@ -5,7 +5,7 @@
 <p style="text-align: justify;">Our Crypter will be based on the following components:</p>
 - AES in CBC mode with a 128-bit key for encryption; using PKCS7 padding.
 - HMAC using SHA256 for authentication.
-- Initialization vectors are generated using os.urandom ().
+- Initialization vectors are generated using os.urandom().
 - The password will be static, but in every non-test consideration it should never be placed inside the file, but received from the user
 
 ### Shellcode
