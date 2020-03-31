@@ -651,3 +651,13 @@ uid=0(root) gid=0(root) groups=0(root)
 ```
 
 ### Pwned. ###
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+<p style="text-align: justify;">This blog post has been created for completing the requirements of the SecurityTube Linux Assembly Expert certification: https://www.pentesteracademy.com/course?id=3</p>
+
+Student ID: SLAE-1524
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
