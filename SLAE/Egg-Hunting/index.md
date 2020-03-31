@@ -15,6 +15,8 @@
 - access #2
 - sigaction
 
+<p style="text-align: justify;">In every example, as shellcode we will use a reverse shell written in Assignment number 2, based on the execve-stack technique.</p>
+
 ### Access #1 ###
 
 <p style="text-align: justify;">The simplest idea of egg hunting can be understood on a practical example. We'll start with the first method described by Skape using access() system call. It is used to verify whether a given process has permissions in the system to access the file on the filesystem.</p>
